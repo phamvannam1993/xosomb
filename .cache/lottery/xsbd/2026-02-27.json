@@ -1,0 +1,79 @@
+{
+  "date": "2026-02-27",
+  "code": "xsbd",
+  "region": "south",
+  "province": "Bình Dương",
+  "shortName": "XSBD",
+  "scheme": "southCentral",
+  "specialPrize": "100227",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "22"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "083"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "4091",
+        "1748",
+        "6009"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "5539"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "78751",
+        "15974",
+        "00848",
+        "63010",
+        "53556",
+        "93790",
+        "28082"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "86583",
+        "98845"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "66611"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "31813"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "100227"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsbd/30-ngay",
+  "updatedAt": "2026-06-19T13:28:09.737Z",
+  "fetchedAt": "2026-06-19T13:28:09.737Z",
+  "dataSource": "html"
+}

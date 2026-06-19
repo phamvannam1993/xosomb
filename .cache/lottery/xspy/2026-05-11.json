@@ -1,0 +1,22 @@
+{
+  "date": "2026-05-11",
+  "code": "xspy",
+  "region": "central",
+  "province": "Phú Yên",
+  "shortName": "XSPY",
+  "scheme": "southCentral",
+  "specialPrize": "218982",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "218982"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xspy/ngay-11-5-2026",
+  "updatedAt": "2026-06-19T20:22:23.000Z",
+  "fetchedAt": "2026-06-19T13:22:23.024Z",
+  "dataSource": "rss"
+}

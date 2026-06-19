@@ -1,0 +1,22 @@
+{
+  "date": "2026-06-11",
+  "code": "xsqb",
+  "region": "central",
+  "province": "Quảng Bình",
+  "shortName": "XSQB",
+  "scheme": "southCentral",
+  "specialPrize": "362449",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "362449"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsqb/ngay-11-6-2026",
+  "updatedAt": "2026-06-19T20:23:02.000Z",
+  "fetchedAt": "2026-06-19T13:23:02.790Z",
+  "dataSource": "rss"
+}

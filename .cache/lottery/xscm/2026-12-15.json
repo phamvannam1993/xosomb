@@ -1,0 +1,79 @@
+{
+  "date": "2026-12-15",
+  "code": "xscm",
+  "region": "south",
+  "province": "Cà Mau",
+  "shortName": "XSCM",
+  "scheme": "southCentral",
+  "specialPrize": "989912",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "67"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "745"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "1229",
+        "2602",
+        "4444"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "4230"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "90962",
+        "35666",
+        "45918",
+        "45514",
+        "83216",
+        "05689",
+        "71925"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "47125",
+        "30563"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "30559"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "77350"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "989912"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xscm/30-ngay",
+  "updatedAt": "2026-06-19T13:59:33.026Z",
+  "fetchedAt": "2026-06-19T13:59:33.026Z",
+  "dataSource": "html"
+}

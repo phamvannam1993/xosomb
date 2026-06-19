@@ -1,0 +1,22 @@
+{
+  "date": "2026-05-19",
+  "code": "xsbt",
+  "region": "south",
+  "province": "Bến Tre",
+  "shortName": "XSBT",
+  "scheme": "southCentral",
+  "specialPrize": "985684",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "985684"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsbt/ngay-19-5-2026",
+  "updatedAt": "2026-06-19T18:55:16.000Z",
+  "fetchedAt": "2026-06-19T11:55:16.048Z",
+  "dataSource": "rss"
+}

@@ -1,0 +1,53 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { DateSearchForm } from '@/components/DateSearchForm';
+import { DataUnavailable } from '@/components/DataUnavailable';
+import { DisclaimerBox } from '@/components/DisclaimerBox';
+import { LotteryShell } from '@/components/LotteryShell';
+import { MarketTabs } from '@/components/MarketTabs';
+import { RecentResults } from '@/components/RecentResults';
+import { ResultBoard } from '@/components/ResultBoard';
+import { absoluteUrl } from '@/lib/site';
+import { getLatestLotteryResult, getRecentLotteryResults } from '@/lib/lottery/provider';
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'XSMB hôm nay - Kết quả xổ số miền Bắc mới nhất',
+  description: 'Xem XSMB hôm nay với bảng kết quả xổ số miền Bắc đầy đủ, giải đặc biệt, các giải trong ngày và lô tô 2 số cuối.',
+  alternates: { canonical: absoluteUrl('/') }
+};
+
+export default async function HomePage() {
+  const latest = await getLatestLotteryResult('xsmb');
+  const recent = await getRecentLotteryResults('xsmb');
+
+  return (
+    <LotteryShell>
+      <MarketTabs />
+
+      <section className="searchPanel">
+        <h2>Tra cứu kết quả xổ số theo ngày</h2>
+        <DateSearchForm defaultDate={latest?.date} code="xsmb" />
+      </section>
+
+      {latest ? <ResultBoard result={latest} /> : <DataUnavailable />}
+
+      {recent.length ? <RecentResults results={recent} title="XSMB các ngày gần đây" /> : null}
+
+      <section className="contentPanel seoText">
+        <h2>XSMB hôm nay - kết quả xổ số miền Bắc mới nhất</h2>
+        <p>
+          XoSoMB.vn giúp tra cứu kết quả xổ số miền Bắc theo từng ngày, hiển thị đầy đủ giải đặc biệt, giải nhất,
+          giải nhì, giải ba, giải tư, giải năm, giải sáu, giải bảy và bảng lô tô đầu - đuôi 2 số cuối.
+        </p>
+        <p>
+          Người dùng có thể xem <Link href="/xsmb">XSMB hôm nay</Link>, mở <Link href="/xsmb-30-ngay">sổ kết quả 30 ngày</Link>,
+          hoặc theo dõi <Link href="/lich-mo-thuong">lịch mở thưởng</Link> để tra cứu nhanh hơn.
+        </p>
+      </section>
+
+      <DisclaimerBox />
+    </LotteryShell>
+  );
+}

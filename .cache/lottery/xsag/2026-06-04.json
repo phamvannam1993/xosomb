@@ -1,0 +1,79 @@
+{
+  "date": "2026-06-04",
+  "code": "xsag",
+  "region": "south",
+  "province": "An Giang",
+  "shortName": "XSAG",
+  "scheme": "southCentral",
+  "specialPrize": "827417",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "52"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "564"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "6880",
+        "5902",
+        "6720"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "4602"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "95269",
+        "25412",
+        "61370",
+        "83758",
+        "57095",
+        "66199",
+        "04737"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "49972",
+        "18558"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "61739"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "39822"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "827417"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsag/30-ngay",
+  "updatedAt": "2026-06-19T13:28:10.205Z",
+  "fetchedAt": "2026-06-19T13:28:10.205Z",
+  "dataSource": "html"
+}

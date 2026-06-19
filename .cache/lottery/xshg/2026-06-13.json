@@ -1,0 +1,79 @@
+{
+  "date": "2026-06-13",
+  "code": "xshg",
+  "region": "south",
+  "province": "Hậu Giang",
+  "shortName": "XSHG",
+  "scheme": "southCentral",
+  "specialPrize": "715384",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "93"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "997"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "5513",
+        "3290",
+        "5383"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "3554"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "99954",
+        "05826",
+        "00795",
+        "57565",
+        "48362",
+        "41802",
+        "19136"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "79541",
+        "35356"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "39712"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "92622"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "715384"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xshg/30-ngay",
+  "updatedAt": "2026-06-19T13:41:19.027Z",
+  "fetchedAt": "2026-06-19T13:41:19.027Z",
+  "dataSource": "html"
+}

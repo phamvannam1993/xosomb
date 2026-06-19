@@ -1,0 +1,79 @@
+{
+  "date": "2026-05-31",
+  "code": "xsmn",
+  "region": "south",
+  "province": "miền Nam",
+  "shortName": "XSMN",
+  "scheme": "southCentral",
+  "specialPrize": "805808",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "31"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "257"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "9062",
+        "7997",
+        "3321"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "4840"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "40480",
+        "76299",
+        "48432",
+        "07033",
+        "83564",
+        "71301",
+        "74717"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "90019",
+        "48890"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "78557"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "46949"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "805808"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmn/30-ngay",
+  "updatedAt": "2026-06-19T15:08:18.117Z",
+  "fetchedAt": "2026-06-19T15:08:18.117Z",
+  "dataSource": "html"
+}

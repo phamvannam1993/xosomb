@@ -1,0 +1,22 @@
+{
+  "date": "2026-04-29",
+  "code": "xsdn",
+  "region": "south",
+  "province": "Đồng Nai",
+  "shortName": "XSDN",
+  "scheme": "southCentral",
+  "specialPrize": "537291",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "537291"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsdn/ngay-29-4-2026",
+  "updatedAt": "2026-06-19T20:22:52.000Z",
+  "fetchedAt": "2026-06-19T13:22:55.414Z",
+  "dataSource": "rss"
+}

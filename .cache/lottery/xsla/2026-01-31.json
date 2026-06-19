@@ -1,0 +1,79 @@
+{
+  "date": "2026-01-31",
+  "code": "xsla",
+  "region": "south",
+  "province": "Long An",
+  "shortName": "XSLA",
+  "scheme": "southCentral",
+  "specialPrize": "362662",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "37"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "528"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "4739",
+        "7149",
+        "4036"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "0285"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "08639",
+        "89177",
+        "34502",
+        "38064",
+        "84633",
+        "92460",
+        "47218"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "72448",
+        "92761"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "98717"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "69201"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "362662"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsla/30-ngay",
+  "updatedAt": "2026-06-19T13:41:31.461Z",
+  "fetchedAt": "2026-06-19T13:41:31.461Z",
+  "dataSource": "html"
+}

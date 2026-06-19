@@ -1,0 +1,79 @@
+{
+  "date": "2026-02-05",
+  "code": "xsqt",
+  "region": "central",
+  "province": "Quảng Trị",
+  "shortName": "XSQT",
+  "scheme": "southCentral",
+  "specialPrize": "797024",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "81"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "353"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "3800",
+        "6935",
+        "5871"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "2628"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "50525",
+        "89677",
+        "22181",
+        "12056",
+        "16485",
+        "21512",
+        "56191"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "11822",
+        "34332"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "36075"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "00239"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "797024"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsqt/30-ngay",
+  "updatedAt": "2026-06-19T15:05:37.963Z",
+  "fetchedAt": "2026-06-19T15:05:37.963Z",
+  "dataSource": "html"
+}

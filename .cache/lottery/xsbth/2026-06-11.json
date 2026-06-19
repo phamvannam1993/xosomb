@@ -1,0 +1,22 @@
+{
+  "date": "2026-06-11",
+  "code": "xsbth",
+  "region": "south",
+  "province": "Bình Thuận",
+  "shortName": "XSBTH",
+  "scheme": "southCentral",
+  "specialPrize": "146616",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "146616"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsbth/ngay-11-6-2026",
+  "updatedAt": "2026-06-19T20:22:51.000Z",
+  "fetchedAt": "2026-06-19T13:23:01.128Z",
+  "dataSource": "rss"
+}

@@ -1,0 +1,22 @@
+{
+  "date": "2026-05-23",
+  "code": "xsbp",
+  "region": "south",
+  "province": "Bình Phước",
+  "shortName": "XSBP",
+  "scheme": "southCentral",
+  "specialPrize": "020319",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "020319"
+      ]
+    }
+  ],
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsbp/ngay-23-5-2026",
+  "updatedAt": "2026-06-19T20:22:51.000Z",
+  "fetchedAt": "2026-06-19T13:22:51.048Z",
+  "dataSource": "rss"
+}

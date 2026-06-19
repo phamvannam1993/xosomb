@@ -1,0 +1,79 @@
+{
+  "date": "2026-01-05",
+  "code": "xsdt",
+  "region": "south",
+  "province": "Đồng Tháp",
+  "shortName": "XSDT",
+  "scheme": "southCentral",
+  "specialPrize": "247563",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "19"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "036"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "4755",
+        "6251",
+        "8451"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "6380"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "30067",
+        "17785",
+        "19439",
+        "22106",
+        "60895",
+        "44504",
+        "17408"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "01587",
+        "83250"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "10523"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "23430"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "247563"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsdt/30-ngay",
+  "updatedAt": "2026-06-19T13:43:36.305Z",
+  "fetchedAt": "2026-06-19T13:43:36.305Z",
+  "dataSource": "html"
+}

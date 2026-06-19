@@ -1,0 +1,79 @@
+{
+  "date": "2026-12-26",
+  "code": "xsvl",
+  "region": "south",
+  "province": "Vĩnh Long",
+  "shortName": "XSVL",
+  "scheme": "southCentral",
+  "specialPrize": "808138",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "17"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "961"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "3720",
+        "7977",
+        "2903"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "3718"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "03537",
+        "39330",
+        "37521",
+        "49685",
+        "69045",
+        "35795",
+        "06950"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "11497",
+        "30955"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "28379"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "09201"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "808138"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsvl/30-ngay",
+  "updatedAt": "2026-06-19T13:28:25.308Z",
+  "fetchedAt": "2026-06-19T13:28:25.308Z",
+  "dataSource": "html"
+}

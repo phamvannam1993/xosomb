@@ -1,0 +1,79 @@
+{
+  "date": "2026-02-18",
+  "code": "xsct",
+  "region": "south",
+  "province": "Cần Thơ",
+  "shortName": "XSCT",
+  "scheme": "southCentral",
+  "specialPrize": "618120",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "85"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "961"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "1667",
+        "4555",
+        "8366"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "4390"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "78430",
+        "17060",
+        "69689",
+        "82153",
+        "43412",
+        "11824",
+        "12702"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "49802",
+        "95950"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "85900"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "49185"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "618120"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsct/30-ngay",
+  "updatedAt": "2026-06-19T13:41:40.112Z",
+  "fetchedAt": "2026-06-19T13:41:40.112Z",
+  "dataSource": "html"
+}

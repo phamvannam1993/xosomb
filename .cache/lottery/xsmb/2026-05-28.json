@@ -1,0 +1,83 @@
+{
+  "date": "2026-05-28",
+  "code": "xsmb",
+  "region": "north",
+  "province": "miền Bắc",
+  "shortName": "XSMB",
+  "scheme": "north",
+  "specialPrize": "00250",
+  "prizes": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "00250"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "39010"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "17976",
+        "39936"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "42031",
+        "64949",
+        "97106",
+        "54435",
+        "54616",
+        "77577"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "8278",
+        "6410",
+        "3916",
+        "6841"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "6276",
+        "1064",
+        "1327",
+        "7788",
+        "9700",
+        "4619"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "264",
+        "345",
+        "791"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "16",
+        "00",
+        "51",
+        "99"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmb/30-ngay",
+  "updatedAt": "2026-06-19T15:32:44.801Z",
+  "fetchedAt": "2026-06-19T15:32:44.801Z",
+  "dataSource": "html"
+}

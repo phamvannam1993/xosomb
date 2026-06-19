@@ -1,0 +1,79 @@
+{
+  "date": "2026-06-13",
+  "code": "xshcm",
+  "region": "south",
+  "province": "Hồ Chí Minh",
+  "shortName": "XSHCM",
+  "scheme": "southCentral",
+  "specialPrize": "122619",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "74"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "065"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "5693",
+        "1685",
+        "8492"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "3617"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "36839",
+        "53264",
+        "34587",
+        "55978",
+        "41396",
+        "20441",
+        "62133"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "94357",
+        "13753"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "87108"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "64203"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "122619"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xshcm-xstp/30-ngay",
+  "updatedAt": "2026-06-19T13:41:33.459Z",
+  "fetchedAt": "2026-06-19T13:41:33.459Z",
+  "dataSource": "html"
+}

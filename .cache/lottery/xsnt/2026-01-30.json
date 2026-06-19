@@ -1,0 +1,79 @@
+{
+  "date": "2026-01-30",
+  "code": "xsnt",
+  "region": "central",
+  "province": "Ninh Thuận",
+  "shortName": "XSNT",
+  "scheme": "southCentral",
+  "specialPrize": "825377",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "61"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "498"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "1434",
+        "2797",
+        "1195"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "0546"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "05674",
+        "38521",
+        "80249",
+        "78492",
+        "55841",
+        "33453",
+        "62527"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "27413",
+        "40207"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "90648"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "85019"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "825377"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsnt/30-ngay",
+  "updatedAt": "2026-06-19T13:28:31.812Z",
+  "fetchedAt": "2026-06-19T13:28:31.812Z",
+  "dataSource": "html"
+}

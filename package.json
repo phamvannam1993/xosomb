@@ -1,0 +1,28 @@
+{
+  "name": "xosomb-nextjs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Next.js App Router cho website tra cứu kết quả xổ số, tối ưu SEO, render server-side và cache dữ liệu.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "16.2.9",
+    "typescript": "latest"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}

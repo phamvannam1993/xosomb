@@ -1,0 +1,79 @@
+{
+  "date": "2026-05-24",
+  "code": "xstth",
+  "region": "central",
+  "province": "Thừa Thiên Huế",
+  "shortName": "XSTTH",
+  "scheme": "southCentral",
+  "specialPrize": "032740",
+  "prizes": [
+    {
+      "label": "Giải tám",
+      "numbers": [
+        "38"
+      ]
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [
+        "694"
+      ]
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "7470",
+        "1804",
+        "6936"
+      ]
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "2282"
+      ]
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "55175",
+        "62007",
+        "03312",
+        "53261",
+        "26703",
+        "43913",
+        "26848"
+      ]
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "69695",
+        "18389"
+      ]
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "79011"
+      ]
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "41391"
+      ]
+    },
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "032740"
+      ]
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xstth/30-ngay",
+  "updatedAt": "2026-06-19T13:59:27.820Z",
+  "fetchedAt": "2026-06-19T13:59:27.820Z",
+  "dataSource": "html"
+}
