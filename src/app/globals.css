@@ -22,16 +22,6 @@
 
 html {
   scroll-behavior: smooth;
-  font-feature-settings: "rlig" 1, "calt" 1;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-code, pre {
-  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Oxygen, Ubuntu, Menlo, Courier, monospace;
 }
 
 body {
@@ -40,11 +30,9 @@ body {
   background:
     radial-gradient(circle at top left, rgba(255, 240, 211, 0.75), transparent 420px),
     linear-gradient(180deg, #fff9f1 0, var(--page-bg) 240px);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
   line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -450,20 +438,9 @@ input {
 }
 
 .contentPanel code {
-  padding: 2px 6px;
+  padding: 2px 5px;
   background: #f7ead7;
   border-radius: 6px;
-  font-size: 0.92em;
-  font-weight: 500;
-}
-
-.contentPanel pre {
-  background: #f5f5f5;
-  padding: 12px;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-size: 0.88em;
-  line-height: 1.6;
 }
 
 .dateForm {
@@ -656,14 +633,14 @@ input[type='date'] {
 .digitFilter {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 5px;
   justify-content: flex-end;
 }
 
 .digitButton {
   display: inline-grid;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   place-items: center;
   color: #fff;
   background: var(--brand-2);
@@ -1422,6 +1399,39 @@ input[type='date'] {
   color: #6a3900;
   font-size: 0.92rem;
   font-weight: 900;
+}
+
+.drawTimeBadge {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border: 1px solid #f3c06f;
+  border-radius: 999px;
+  background: #fff4dd;
+  color: #7a4300;
+  font-size: 0.86rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.drawTimeBadge[data-status='live'] {
+  border-color: #fda4af;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.drawTimeBadge[data-status='after'] {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.drawTimeBadge[data-status='off_day'] {
+  border-color: #e5e7eb;
+  background: #f8fafc;
+  color: #475569;
 }
 
 .quayBoard {

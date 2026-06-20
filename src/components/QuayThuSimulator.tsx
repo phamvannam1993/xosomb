@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getSourcesByRegion } from "@/lib/lottery/catalog";
+import { getLotteryDrawInfo, type DrawInfo, type LotteryDrawRegion } from "@/lib/lottery/draw-time";
 import {
   buildHeadTailTable,
   todayInVietnam,
@@ -13,6 +14,12 @@ import type { LotteryResult, PrizeSchemeId } from "@/lib/lottery/types";
 
 type QuayRegion = "xsmb" | "xsmn" | "xsmt";
 type DisplayMode = "all" | "last2" | "last3";
+
+type LiveLotteryPayload = {
+  data?: LotteryResult;
+  complete?: boolean;
+  filledCells?: number;
+};
 
 type Option = {
   code: string;
@@ -117,6 +124,20 @@ function getRegionConfig(region: QuayRegion): RegionConfig {
     shortName: "XSMB",
     options: northStations,
   };
+}
+
+function getDrawRegion(region: QuayRegion): LotteryDrawRegion {
+  if (region === "xsmb") return "north";
+  if (region === "xsmn") return "south";
+  return "central";
+}
+
+function getDrawCheckCode(config: RegionConfig, selectedOption: Option) {
+  return config.key === "xsmb" ? selectedOption.code : selectedOption.code;
+}
+
+function getLiveLookupCode(config: RegionConfig, selectedOption: Option) {
+  return config.key === "xsmb" ? "xsmb" : selectedOption.code;
 }
 
 function randomInt(max: number) {
@@ -230,6 +251,70 @@ function buildDrawSteps(result: LotteryResult): DrawStep[] {
   return [...normalSteps, ...specialSteps];
 }
 
+function getLiveNumberForStep(
+  liveResult: LotteryResult | null,
+  step: DrawStep,
+  scheme?: PrizeSchemeId,
+) {
+  if (!liveResult) return null;
+  if (scheme && isSpecialPrizeLabel(step.label) && !shouldRevealSpecial(liveResult, scheme)) {
+    return null;
+  }
+
+  const liveRow = liveResult.prizes.find((row) => row.label === step.label);
+  return liveRow?.numbers[step.numberIndex] || null;
+}
+
+function countExpectedNormalCells(scheme: PrizeSchemeId) {
+  return getPrizeSpecs(scheme)
+    .filter((spec) => !isSpecialPrizeLabel(spec.label))
+    .reduce((sum, spec) => sum + spec.count, 0);
+}
+
+function countAvailableNormalCells(result: LotteryResult | null) {
+  if (!result) return 0;
+  return result.prizes.reduce(
+    (sum, row) => sum + (isSpecialPrizeLabel(row.label) ? 0 : row.numbers.length),
+    0,
+  );
+}
+
+function shouldRevealSpecial(liveResult: LotteryResult | null, scheme: PrizeSchemeId) {
+  if (!liveResult) return false;
+  return countAvailableNormalCells(liveResult) >= countExpectedNormalCells(scheme);
+}
+
+function isCompletePrizeRows(result: LotteryResult | null, scheme: PrizeSchemeId) {
+  if (!result) return false;
+  return getPrizeSpecs(scheme).every((spec) => {
+    const row = result.prizes.find((item) => item.label === spec.label);
+    return Boolean(row && row.numbers.length >= spec.count);
+  });
+}
+
+function mergeLiveRows(
+  currentRows: LotteryResult["prizes"],
+  liveResult: LotteryResult,
+  scheme: PrizeSchemeId,
+) {
+  const revealSpecial = shouldRevealSpecial(liveResult, scheme);
+  const nextRows = clonePrizeRows(currentRows);
+
+  liveResult.prizes.forEach((liveRow) => {
+    if (isSpecialPrizeLabel(liveRow.label) && !revealSpecial) return;
+    const rowIndex = nextRows.findIndex((row) => row.label === liveRow.label);
+    if (rowIndex < 0) return;
+
+    liveRow.numbers.forEach((number, numberIndex) => {
+      if (numberIndex < nextRows[rowIndex].numbers.length) {
+        nextRows[rowIndex].numbers[numberIndex] = number;
+      }
+    });
+  });
+
+  return nextRows;
+}
+
 function getStepDuration(step: DrawStep) {
   if (isSpecialPrizeLabel(step.label)) return 2200;
   if (step.length >= 5) return 900;
@@ -263,23 +348,28 @@ export function QuayThuSimulator({
   const [selectedCode, setSelectedCode] = useState(
     config.options[0]?.code || config.code,
   );
-  const selectedOption = config.options.find(
-    (item) => item.code === selectedCode,
-  ) ||
-    config.options[0] || {
-      code: config.code,
-      label: config.province,
-      shortName: config.shortName,
-    };
+  const selectedOption = useMemo(
+    () =>
+      config.options.find((item) => item.code === selectedCode) ||
+      config.options[0] || {
+        code: config.code,
+        label: config.province,
+        shortName: config.shortName,
+      },
+    [config, selectedCode],
+  );
   const [mode, setMode] = useState<DisplayMode>("all");
   const [activeDigit, setActiveDigit] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [activeCell, setActiveCell] = useState<ActiveCell>(null);
   const [spinStatus, setSpinStatus] = useState("Sẵn sàng quay thử");
+  const [currentDrawInfo, setCurrentDrawInfo] = useState<DrawInfo | null>(null);
   const [displayRows, setDisplayRows] = useState(blankRows);
   const [result, setResult] = useState<LotteryResult | null>(null);
   const timeoutRefs = useRef<number[]>([]);
   const intervalRef = useRef<number | null>(null);
+  const livePollRef = useRef<number | null>(null);
+  const liveResultRef = useRef<LotteryResult | null>(null);
   const sessionRef = useRef(0);
 
   const headTailRows = result ? buildHeadTailTable(result) : [];
@@ -293,14 +383,21 @@ export function QuayThuSimulator({
       window.clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
+    if (livePollRef.current) {
+      window.clearInterval(livePollRef.current);
+      livePollRef.current = null;
+    }
   }
 
   function resetBoard(status = "Sẵn sàng quay thử") {
     clearSpinTimers();
     sessionRef.current += 1;
+    liveResultRef.current = null;
     setResult(null);
     setIsSpinning(false);
     setActiveCell(null);
+    setCurrentDrawInfo(null);
     setSpinStatus(status);
     setDisplayRows(buildBlankRows(config.scheme));
   }
@@ -312,9 +409,103 @@ export function QuayThuSimulator({
     };
   }, []);
 
-  function handleSpin() {
+  const drawInfoPreview = useMemo(
+    () =>
+      getLotteryDrawInfo({
+        code: getDrawCheckCode(config, selectedOption),
+        region: getDrawRegion(config.key),
+      }),
+    [config, selectedOption],
+  );
+  const liveCode = getLiveLookupCode(config, selectedOption);
+
+  async function fetchLiveResult(sessionId: number) {
+    try {
+      const params = new URLSearchParams({
+        code: liveCode,
+        date: todayInVietnam(),
+        live: "1",
+      });
+      const response = await fetch(`/api/lottery?${params.toString()}`, {
+        cache: "no-store",
+      });
+
+      if (sessionRef.current !== sessionId || response.status === 404) return null;
+      if (!response.ok) return null;
+
+      const payload = (await response.json()) as LiveLotteryPayload;
+      return payload.data || null;
+    } catch {
+      return null;
+    }
+  }
+
+
+  async function fetchPublishedResult(sessionId: number) {
+    try {
+      const params = new URLSearchParams({
+        code: liveCode,
+        date: todayInVietnam(),
+      });
+      const response = await fetch(`/api/lottery?${params.toString()}`, {
+        cache: "no-store",
+      });
+
+      if (sessionRef.current !== sessionId || response.status === 404) return null;
+      if (!response.ok) return null;
+
+      const payload = (await response.json()) as LiveLotteryPayload;
+      return payload.data || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function applyLiveResult(liveResult: LotteryResult, sessionId: number) {
+    if (sessionRef.current !== sessionId) return;
+
+    liveResultRef.current = liveResult;
+    setDisplayRows((currentRows) =>
+      mergeLiveRows(currentRows, liveResult, config.scheme),
+    );
+
+    const filled = liveResult.prizes.reduce(
+      (sum, row) => sum + row.numbers.length,
+      0,
+    );
+    setSpinStatus(
+      `Đã nhận realtime ${filled} ô dữ liệu; ô chưa có tiếp tục quay`,
+    );
+
+    if (isCompletePrizeRows(liveResult, config.scheme)) {
+      clearSpinTimers();
+      setDisplayRows(() => mergeLiveRows(blankRows, liveResult, config.scheme));
+      setResult(liveResult);
+      setIsSpinning(false);
+      setActiveCell(null);
+      setSpinStatus("Đã cập nhật đủ kết quả realtime");
+    }
+  }
+
+  function startLivePolling(sessionId: number, intervalMs = 3500) {
+    const poll = async () => {
+      const liveResult = await fetchLiveResult(sessionId);
+      if (liveResult) applyLiveResult(liveResult, sessionId);
+    };
+
+    void poll();
+    livePollRef.current = window.setInterval(() => {
+      void poll();
+    }, intervalMs);
+  }
+
+  async function handleSpin() {
     clearSpinTimers();
 
+    const drawInfo = getLotteryDrawInfo({
+      code: getDrawCheckCode(config, selectedOption),
+      region: getDrawRegion(config.key),
+    });
     const targetResult = createMockResult(config, selectedOption);
     const steps = buildDrawSteps(targetResult);
     const sessionId = sessionRef.current + 1;
@@ -323,15 +514,80 @@ export function QuayThuSimulator({
     setResult(null);
     setDisplayRows(buildBlankRows(config.scheme));
     setIsSpinning(true);
+    setCurrentDrawInfo(drawInfo);
+    liveResultRef.current = null;
     setActiveCell(null);
-    setSpinStatus("Đang chuẩn bị quay...");
+    setSpinStatus(drawInfo.message);
 
-    let delay = 180;
+    let initialLiveResult: LotteryResult | null = null;
+
+    if (drawInfo.shouldFetchFinal) {
+      setSpinStatus("Đã qua giờ quay, đang kiểm tra kết quả thật mới nhất...");
+      initialLiveResult = await fetchPublishedResult(sessionId);
+
+      if (sessionRef.current !== sessionId) return;
+
+      if (initialLiveResult && isCompletePrizeRows(initialLiveResult, config.scheme)) {
+        const completeLiveResult = initialLiveResult;
+        setDisplayRows(() => mergeLiveRows(blankRows, completeLiveResult, config.scheme));
+        setResult(completeLiveResult);
+        setIsSpinning(false);
+        setActiveCell(null);
+        setSpinStatus("Đã có kết quả thật sau giờ mở thưởng");
+        return;
+      }
+
+      if (initialLiveResult) {
+        liveResultRef.current = initialLiveResult;
+        setDisplayRows((currentRows) =>
+          mergeLiveRows(currentRows, initialLiveResult as LotteryResult, config.scheme),
+        );
+      }
+    }
+
+    if (drawInfo.shouldPollRealtime) {
+      startLivePolling(sessionId, drawInfo.status === "after" ? 5000 : 3200);
+      setSpinStatus(
+        drawInfo.status === "live"
+          ? "Đang mở thưởng: realtime ô nào có dữ liệu sẽ hiển thị ngay"
+          : "Đã qua giờ quay: đang chờ nguồn cập nhật, ô chưa có sẽ quay mô phỏng",
+      );
+    } else {
+      setSpinStatus(drawInfo.message);
+    }
+
+    let delay = drawInfo.status === "live" ? 160 : 260;
 
     steps.forEach((step, stepIndex) => {
       const duration = getStepDuration(step);
       const startTimer = window.setTimeout(() => {
         if (sessionRef.current !== sessionId) return;
+
+        const availableLiveValue = getLiveNumberForStep(
+          liveResultRef.current,
+          step,
+          config.scheme,
+        );
+        if (availableLiveValue) {
+          setDisplayRows((currentRows) =>
+            setCellValue(
+              currentRows,
+              step.rowIndex,
+              step.numberIndex,
+              availableLiveValue,
+            ),
+          );
+          if (stepIndex === steps.length - 1) {
+            const liveResult = liveResultRef.current;
+            if (liveResult) {
+              setResult(liveResult);
+              setIsSpinning(false);
+              setActiveCell(null);
+              setSpinStatus("Đã cập nhật kết quả realtime");
+            }
+          }
+          return;
+        }
 
         setActiveCell({
           rowIndex: step.rowIndex,
@@ -357,6 +613,29 @@ export function QuayThuSimulator({
 
         intervalRef.current = window.setInterval(() => {
           if (sessionRef.current !== sessionId) return;
+
+          const availableLiveValue = getLiveNumberForStep(
+            liveResultRef.current,
+            step,
+            config.scheme,
+          );
+          if (availableLiveValue) {
+            if (intervalRef.current) {
+              window.clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
+            setDisplayRows((currentRows) =>
+              setCellValue(
+                currentRows,
+                step.rowIndex,
+                step.numberIndex,
+                availableLiveValue,
+              ),
+            );
+            setActiveCell(null);
+            return;
+          }
+
           setDisplayRows((currentRows) =>
             setCellValue(
               currentRows,
@@ -375,20 +654,50 @@ export function QuayThuSimulator({
             intervalRef.current = null;
           }
 
+          const finalValue =
+            getLiveNumberForStep(liveResultRef.current, step, config.scheme) ||
+            step.number;
+
           setDisplayRows((currentRows) =>
             setCellValue(
               currentRows,
               step.rowIndex,
               step.numberIndex,
-              step.number,
+              finalValue,
             ),
           );
           setActiveCell(null);
 
           if (stepIndex === steps.length - 1) {
-            setResult(targetResult);
+            const liveResult = liveResultRef.current;
+            const finalResult = isCompletePrizeRows(liveResult, config.scheme)
+              ? liveResult
+              : {
+                  ...targetResult,
+                  prizes: mergeLiveRows(
+                    targetResult.prizes,
+                    liveResult || targetResult,
+                    config.scheme,
+                  ),
+                  sourceName: liveResult
+                    ? "Realtime kết hợp quay thử"
+                    : targetResult.sourceName,
+                  dataSource: liveResult ? "html" : targetResult.dataSource,
+                };
+
+            if (livePollRef.current) {
+              window.clearInterval(livePollRef.current);
+              livePollRef.current = null;
+            }
+            setResult(finalResult);
             setIsSpinning(false);
-            setSpinStatus("Đã quay xong");
+            setSpinStatus(
+              liveResult
+                ? "Đã quay xong, dữ liệu realtime đã được ưu tiên hiển thị"
+                : drawInfo.shouldUseSimulationOnly
+                  ? "Đã quay xong bằng mô phỏng"
+                  : "Đã quay xong trong lúc chờ nguồn cập nhật",
+            );
           }
         }, duration);
 
@@ -428,8 +737,7 @@ export function QuayThuSimulator({
           {config.title} ngày {dateText.replace(/^.*?,\s*/u, "")}
         </h1>
         <p>
-          Công cụ mô phỏng kết quả để tham khảo giao diện. Kết quả quay thử
-          không phải kết quả mở thưởng thật và không có giá trị dự đoán.
+          {currentDrawInfo?.message || drawInfoPreview.message}
         </p>
       </div>
 
@@ -449,6 +757,9 @@ export function QuayThuSimulator({
         <button type="button" onClick={handleSpin} disabled={isSpinning}>
           {isSpinning ? "Đang quay..." : "Bắt đầu quay"}
         </button>
+        <span className="drawTimeBadge" data-status={(currentDrawInfo || drawInfoPreview).status}>
+          {(currentDrawInfo || drawInfoPreview).shortMessage}
+        </span>
         <span className="quayStatus" aria-live="polite">
           {spinStatus}
         </span>

@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLotterySource } from '@/lib/lottery/catalog';
-import { getLatestLotteryResult, getLotteryResult, getLotteryRuntimeConfig, getRecentLotteryResults } from '@/lib/lottery/provider';
+import { getLatestLotteryResult, getLiveLotteryResult, getLotteryResult, getLotteryRuntimeConfig, getRecentLotteryResults } from '@/lib/lottery/provider';
 import { isYyyyMmDd } from '@/lib/lottery/format';
+import { isCompleteLotteryResult, liveCompletenessScore } from '@/lib/lottery/normalize';
 
 export const revalidate = 60;
 
-function json(data: unknown, init?: ResponseInit) {
+function json(data: unknown, init?: ResponseInit, options: { noStore?: boolean } = {}) {
   const response = NextResponse.json(data, init);
   response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  if (options.noStore) response.headers.set('Cache-Control', 'no-store, max-age=0');
   return response;
 }
 
@@ -24,6 +26,30 @@ export async function GET(request: NextRequest) {
 
   if (date && !isYyyyMmDd(date)) {
     return json({ error: 'date phải có định dạng YYYY-MM-DD' }, { status: 400 });
+  }
+
+  const live = searchParams.get('live');
+  if (live === '1' || live === 'true') {
+    const result = await getLiveLotteryResult(source.code, date);
+    if (!result) {
+      return json(
+        { error: 'Chưa có dữ liệu realtime', code: source.code, date: date || null, runtime: getLotteryRuntimeConfig() },
+        { status: 404 },
+        { noStore: true }
+      );
+    }
+
+    return json(
+      {
+        data: result,
+        live: true,
+        complete: isCompleteLotteryResult(result),
+        filledCells: liveCompletenessScore(result),
+        runtime: getLotteryRuntimeConfig()
+      },
+      undefined,
+      { noStore: true }
+    );
   }
 
   if (recent) {

@@ -1,9 +1,9 @@
 import { getLotterySource } from './catalog';
 import type { LotteryResult, ProviderMode } from './types';
 import { isYyyyMmDd, todayInVietnam } from './format';
-import { isCompleteLotteryResult, normalizeApiResult, pickBetterLotteryResult } from './normalize';
+import { hasPartialLotteryResult, isCompleteLotteryResult, normalizeApiResult, normalizePartialApiResult, pickBetterLiveLotteryResult, pickBetterLotteryResult } from './normalize';
 import { fetchLotteryFromRss } from './rss';
-import { fetchLotteryFromHtml, fetchRecentLotteryFromHtml } from './html';
+import { fetchLotteryFromHtml, fetchPartialLotteryFromHtml, fetchRecentLotteryFromHtml } from './html';
 import { readCachedResult, readRecentCachedResults, writeCachedResult, writeCachedResults } from './cache';
 import { mockByCodeDate, mockLatestByCode, mockRecentByCode } from './mock';
 
@@ -52,6 +52,32 @@ async function fetchFromExternalApi(code: string, date: string): Promise<Lottery
   if (!response.ok) throw new Error(`Không lấy được dữ liệu từ API: ${response.status}`);
 
   return normalizeApiResult(await response.json(), source);
+}
+
+async function fetchLiveFromExternalApi(code: string, date: string): Promise<LotteryResult | null> {
+  const source = resolveSource(code);
+  const endpoint = process.env.LOTTERY_DATA_API || process.env.XSMB_DATA_API;
+  if (!endpoint) return null;
+
+  const url = new URL(endpoint);
+  url.searchParams.set('code', source.code);
+  url.searchParams.set('date', date);
+  url.searchParams.set('live', '1');
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+      ...(process.env.LOTTERY_API_KEY || process.env.XSMB_API_KEY
+        ? { Authorization: `Bearer ${process.env.LOTTERY_API_KEY || process.env.XSMB_API_KEY}` }
+        : {})
+    },
+    cache: 'no-store'
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Không lấy được dữ liệu realtime từ API: ${response.status}`);
+
+  return normalizePartialApiResult(await response.json(), source, 'API dữ liệu xổ số realtime');
 }
 
 async function fetchHistoryFromExternalApi(code: string, limit = 30): Promise<LotteryResult[]> {
@@ -116,6 +142,51 @@ async function fetchLotteryFromRecentHistory(code: string, date: string, limit =
   const history = completeList(await fetchRecentLotteryFromHtml(source, limit).catch(() => []));
   if (history.length) await writeCachedResults(history);
   return history.find((item) => item.date === date) || null;
+}
+
+export async function getLiveLotteryResult(code = 'xsmb', date?: string): Promise<LotteryResult | null> {
+  const source = resolveSource(code);
+  const normalizedDate = normalizeDate(date);
+  const mode = providerMode();
+
+  // Realtime không tự trả mock để tránh nhầm với kết quả thật.
+  // Nếu cần test dev, bật LOTTERY_LIVE_ALLOW_MOCK=true.
+  if (mode === 'mock') {
+    return process.env.LOTTERY_LIVE_ALLOW_MOCK === 'true' ? mockByCodeDate(source.code, normalizedDate) : null;
+  }
+
+  let best: LotteryResult | null = await readCachedResult(source.code, normalizedDate);
+  if (isCompleteLotteryResult(best)) return best;
+
+  if (mode === 'api' || mode === 'auto') {
+    const fromApi = await fetchLiveFromExternalApi(source.code, normalizedDate).catch(() => null);
+    best = pickBetterLiveLotteryResult(best, fromApi);
+    if (isCompleteLotteryResult(best)) {
+      await writeCachedResult(best);
+      return best;
+    }
+  }
+
+  if (mode === 'html' || mode === 'auto' || mode === 'rss') {
+    const fromHtml = await fetchPartialLotteryFromHtml(source, normalizedDate).catch(() => null);
+    best = pickBetterLiveLotteryResult(best, fromHtml);
+    if (isCompleteLotteryResult(best)) {
+      await writeCachedResult(best);
+      return best;
+    }
+  }
+
+  if (mode === 'rss' || mode === 'auto') {
+    const fromRss = await fetchRssAndCache(source.code).catch(() => []);
+    const matched = fromRss.find((item) => item.date === normalizedDate) || null;
+    best = pickBetterLiveLotteryResult(best, matched);
+    if (isCompleteLotteryResult(best)) {
+      await writeCachedResult(best);
+      return best;
+    }
+  }
+
+  return hasPartialLotteryResult(best) ? best : null;
 }
 
 export async function getLotteryResult(code = 'xsmb', date?: string): Promise<LotteryResult | null> {

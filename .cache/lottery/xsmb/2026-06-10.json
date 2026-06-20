@@ -75,9 +75,9 @@
       ]
     }
   ],
-  "sourceName": "XSKT RSS",
-  "sourceUrl": "https://xskt.com.vn/xsmb/ngay-10-6-2026",
-  "updatedAt": "2026-06-19T18:30:18.000Z",
-  "fetchedAt": "2026-06-19T11:49:00.890Z",
-  "dataSource": "rss"
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmb/30-ngay",
+  "updatedAt": "2026-06-20T11:55:15.756Z",
+  "fetchedAt": "2026-06-20T11:55:15.756Z",
+  "dataSource": "html"
 }

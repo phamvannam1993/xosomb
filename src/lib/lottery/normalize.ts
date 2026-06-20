@@ -271,6 +271,15 @@ function extractDataObject(value: unknown): unknown {
 }
 
 export function normalizeApiResult(value: unknown, source: LotterySourceConfig, sourceName = 'API dữ liệu xổ số'): LotteryResult | null {
+  const result = normalizePartialApiResult(value, source, sourceName);
+  return hasUsableLotteryResult(result) ? result : null;
+}
+
+export function normalizePartialApiResult(
+  value: unknown,
+  source: LotterySourceConfig,
+  sourceName = 'API dữ liệu xổ số'
+): LotteryResult | null {
   const payload = extractDataObject(value) as Partial<LotteryResult>;
   if (!payload || typeof payload !== 'object') return null;
 
@@ -279,9 +288,9 @@ export function normalizeApiResult(value: unknown, source: LotterySourceConfig, 
   const prizes = normalizePrizeRows(rawRows as PrizeRow[], source.scheme);
   const specialPrize = typeof payload.specialPrize === 'string'
     ? payload.specialPrize
-    : prizes.find((row) => row.label === 'Đặc biệt')?.numbers[0];
+    : prizes.find((row) => row.label === 'Đặc biệt')?.numbers[0] || '';
 
-  if (!date || !specialPrize || !prizes.length) return null;
+  if (!date || !prizes.length) return null;
 
   const result: LotteryResult = {
     date,
@@ -299,10 +308,19 @@ export function normalizeApiResult(value: unknown, source: LotterySourceConfig, 
     dataSource: 'api'
   };
 
-  return hasUsableLotteryResult(result) ? result : null;
+  return hasPartialLotteryResult(result) ? result : null;
 }
 
 export function normalizeResultFromText(
+  rawText: string,
+  source: LotterySourceConfig,
+  options: { date?: string; sourceUrl?: string; sourceName?: string; updatedAt?: string; dataSource?: 'rss' | 'html' } = {}
+): LotteryResult | null {
+  const result = normalizePartialResultFromText(rawText, source, options);
+  return hasUsableLotteryResult(result) ? result : null;
+}
+
+export function normalizePartialResultFromText(
   rawText: string,
   source: LotterySourceConfig,
   options: { date?: string; sourceUrl?: string; sourceName?: string; updatedAt?: string; dataSource?: 'rss' | 'html' } = {}
@@ -312,8 +330,8 @@ export function normalizeResultFromText(
   if (!date) return null;
 
   const prizes = parsePrizeRowsFromText(cleanText, source.scheme);
-  const specialPrize = prizes.find((row) => row.label === 'Đặc biệt')?.numbers[0];
-  if (!specialPrize) return null;
+  const specialPrize = prizes.find((row) => row.label === 'Đặc biệt')?.numbers[0] || '';
+  if (!prizes.length) return null;
 
   const result: LotteryResult = {
     date,
@@ -331,12 +349,25 @@ export function normalizeResultFromText(
     dataSource: options.dataSource || 'html'
   };
 
-  return hasUsableLotteryResult(result) ? result : null;
+  return hasPartialLotteryResult(result) ? result : null;
+}
+
+export function hasPartialLotteryResult(value: LotteryResult | null): value is LotteryResult {
+  if (!value) return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.date)) return false;
+  if (!value.prizes.length) return false;
+
+  const specs = getPrizeSpecs(value.scheme);
+  return value.prizes.every((row) => {
+    const spec = specs.find((item) => item.label === row.label);
+    if (!spec) return false;
+    if (row.numbers.length < 1 || row.numbers.length > spec.count) return false;
+    return row.numbers.every((numberValue) => /^\d+$/.test(numberValue) && numberValue.length === spec.length);
+  });
 }
 
 export function hasUsableLotteryResult(value: LotteryResult | null): value is LotteryResult {
-  if (!value) return false;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.date)) return false;
+  if (!hasPartialLotteryResult(value)) return false;
 
   const specialSpec = getSpecialSpec(value.scheme);
   if (!value.specialPrize || !new RegExp(`^\\d{${specialSpec.length}}$`).test(value.specialPrize)) return false;
@@ -346,13 +377,7 @@ export function hasUsableLotteryResult(value: LotteryResult | null): value is Lo
   );
   if (!hasSpecialPrizeRow) return false;
 
-  const specs = getPrizeSpecs(value.scheme);
-  return value.prizes.every((row) => {
-    const spec = specs.find((item) => item.label === row.label);
-    if (!spec) return false;
-    if (row.numbers.length > spec.count) return false;
-    return row.numbers.every((numberValue) => /^\d+$/.test(numberValue) && numberValue.length === spec.length);
-  });
+  return true;
 }
 
 export function lotteryCompletenessScore(value: LotteryResult | null) {
@@ -376,6 +401,38 @@ export function isCompleteLotteryResult(value: LotteryResult | null): value is L
     const row = value.prizes.find((item) => item.label === spec.label);
     return Boolean(row && row.numbers.length === spec.count);
   });
+}
+
+export function liveCompletenessScore(value: LotteryResult | null) {
+  if (!hasPartialLotteryResult(value)) return 0;
+  const specs = getPrizeSpecs(value.scheme);
+  return specs.reduce((score, spec) => {
+    const row = value.prizes.find((item) => item.label === spec.label);
+    if (!row) return score;
+    return score + Math.min(row.numbers.length, spec.count);
+  }, 0);
+}
+
+export function pickBetterLiveLotteryResult(
+  current: LotteryResult | null,
+  candidate: LotteryResult | null
+): LotteryResult | null {
+  if (!hasPartialLotteryResult(candidate)) return current;
+  if (!hasPartialLotteryResult(current)) return candidate;
+
+  const currentComplete = isCompleteLotteryResult(current);
+  const candidateComplete = isCompleteLotteryResult(candidate);
+  if (candidateComplete && !currentComplete) return candidate;
+  if (currentComplete && !candidateComplete) return current;
+
+  const currentScore = liveCompletenessScore(current);
+  const candidateScore = liveCompletenessScore(candidate);
+  if (candidateScore > currentScore) return candidate;
+
+  const priority: Record<string, number> = { api: 4, html: 3, cache: 2, rss: 1, mock: 0 };
+  const currentPriority = priority[current.dataSource || 'cache'] ?? 0;
+  const candidatePriority = priority[candidate.dataSource || 'cache'] ?? 0;
+  return candidatePriority > currentPriority ? candidate : current;
 }
 
 export function pickBetterLotteryResult(
