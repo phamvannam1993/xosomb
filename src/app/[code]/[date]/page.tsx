@@ -8,7 +8,7 @@ import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { getLotterySource } from '@/lib/lottery/catalog';
 import { isYyyyMmDd, toVietnameseDate, todayInVietnam } from '@/lib/lottery/format';
-import { getLotteryResult } from '@/lib/lottery/provider';
+import { getLotteryResult, getLatestLotteryResult } from '@/lib/lottery/provider';
 import { absoluteUrl } from '@/lib/site';
 
 export const revalidate = 60;
@@ -45,6 +45,7 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
   if (!source || !isYyyyMmDd(date) || date > todayInVietnam()) notFound();
 
   const result = await getLotteryResult(source.code, date);
+  const latest = result || (await getLatestLotteryResult(source.code).catch(() => null));
 
   return (
     <LotteryShell>
@@ -53,12 +54,21 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
         <h2>Tra cứu {source.shortName} theo ngày</h2>
         <DateSearchForm defaultDate={date} code={source.code} />
       </section>
-      {result ? (
-        <ResultBoard result={result} />
+      {latest ? (
+        <>
+          <ResultBoard result={latest} />
+          {!result && (
+            <div className="contentPanel seoText">
+              <p style={{ color: '#666', marginTop: '1rem' }}>
+                Không có dữ liệu cho ngày {date}. Hiển thị kết quả mới nhất từ ngày {latest.date}.
+              </p>
+            </div>
+          )}
+        </>
       ) : (
         <DataUnavailable
-          title={`Chưa có dữ liệu ${source.shortName} ${date}`}
-          message="Kết quả cho ngày này chưa sẵn sàng. Vui lòng chọn ngày khác hoặc quay lại sau."
+          title={`Chưa có dữ liệu ${source.shortName}`}
+          message="Kết quả chưa sẵn sàng. Vui lòng quay lại sau."
         />
       )}
       <DisclaimerBox />
