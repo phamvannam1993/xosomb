@@ -7,8 +7,13 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
+import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
 import { isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
 import { getLotteryResult } from '@/lib/lottery/provider';
+
+function BreadcrumbListSchema({ schema }: { schema: string }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
+}
 
 export const revalidate = 60;
 
@@ -42,9 +47,17 @@ export default async function XsmbByDatePage({ params }: PageProps) {
   if (!isYyyyMmDd(date)) notFound();
   const result = await getLotteryResult('xsmb', date);
 
+  const breadcrumbSchema = generateBreadcrumbListSchema([
+    { name: 'Trang chủ', path: '/' },
+    { name: 'XSMB', path: '/xsmb' },
+    { name: `XSMB ${date}`, path: `/xsmb/${date}` }
+  ]);
+
   return (
-    <LotteryShell>
-      <MarketTabs />
+    <>
+      <BreadcrumbListSchema schema={breadcrumbSchema} />
+      <LotteryShell>
+        <MarketTabs />
       <section className="searchPanel">
         <h2>Tra cứu XSMB theo ngày</h2>
         <DateSearchForm defaultDate={date} code="xsmb" />
@@ -58,6 +71,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
         />
       )}
       <DisclaimerBox />
-    </LotteryShell>
+      </LotteryShell>
+    </>
   );
 }

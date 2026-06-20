@@ -7,7 +7,12 @@ import { MarketTabs } from '@/components/MarketTabs';
 import { RecentResults } from '@/components/RecentResults';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
+import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
 import { getRecentLotteryResults } from '@/lib/lottery/provider';
+
+function BreadcrumbListSchema({ schema }: { schema: string }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
+}
 
 export const revalidate = 60;
 
@@ -19,34 +24,50 @@ export const metadata: Metadata = {
 
 export default async function XsmbThirtyDaysPage() {
   const recent = await getRecentLotteryResults('xsmb');
+  const latest = recent[0] || null;
+
+  const breadcrumbSchema = generateBreadcrumbListSchema([
+    { name: 'Trang chủ', path: '/' },
+    { name: 'XSMB', path: '/xsmb' },
+    { name: 'XSMB 30 ngày', path: '/xsmb-30-ngay' }
+  ]);
 
   return (
-    <LotteryShell>
-      <MarketTabs />
+    <>
+      <BreadcrumbListSchema schema={breadcrumbSchema} />
+      <LotteryShell>
+        <MarketTabs />
       <section className="contentPanel">
         <h1>XSMB 30 ngày - sổ kết quả xổ số miền Bắc</h1>
         <p className="panelLead">
-          Tra cứu kết quả xổ số miền Bắc các ngày gần đây, xem nhanh giải đặc biệt và mở chi tiết từng ngày khi cần đối chiếu.
+          Tra cứu kết quả xổ số miền Bắc các ngày gần đây. Chọn ngày trong danh sách để xem bảng chi tiết đầy đủ.
         </p>
       </section>
 
+      {/* Danh sách link các ngày (không render 30 bảng) */}
       {recent.length ? <RecentResults results={recent} title="Danh sách kết quả XSMB gần đây" /> : <DataUnavailable title="Chưa có sổ kết quả 30 ngày" />}
 
-      {recent.map((result) => (
-        <section className="compactResult" key={result.date}>
-          <ResultBoard result={result} headingLevel={2} />
+      {/* Chỉ show bảng chi tiết cho ngày mới nhất */}
+      {latest && (
+        <section className="compactResult">
+          <ResultBoard result={latest} headingLevel={2} />
         </section>
-      ))}
+      )}
 
       <section className="contentPanel seoText">
-        <h2>Cách tra cứu XSMB 30 ngày</h2>
+        <h2>Cách sử dụng sổ kết quả 30 ngày</h2>
         <p>
-          Chọn ngày trong danh sách để xem bảng kết quả đầy đủ. Mỗi trang ngày có địa chỉ riêng như{' '}
-          <Link href="/xsmb/2026-06-19">/xsmb/2026-06-19</Link>, giúp người dùng dễ lưu lại và tra cứu khi cần.
+          Danh sách trên hiển thị tất cả kết quả 30 ngày gần nhất. Bảng chi tiết dưới đây là kết quả mới nhất.{' '}
+          <strong>Nhấp vào bất kỳ ngày nào trong danh sách</strong> để xem bảng kết quả đầy đủ cho ngày đó (ví dụ:{' '}
+          <Link href="/xsmb/2026-06-19">/xsmb/2026-06-19</Link>).
+        </p>
+        <p>
+          Mỗi ngày có một trang riêng với đường dẫn cố định, giúp bạn dễ dàng lưu và chia sẻ kết quả.
         </p>
       </section>
 
       <DisclaimerBox />
-    </LotteryShell>
+      </LotteryShell>
+    </>
   );
 }

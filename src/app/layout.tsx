@@ -220,7 +220,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="footerTopGrid">
               {footerColumns.map((column) => (
                 <section className="footerColumn" key={column.title}>
-                  <h2>{column.title}</h2>
+                  <div className="footerColumnTitle">{column.title}</div>
                   <ul>
                     {column.links.map((item) => (
                       <li key={`${column.title}-${item.href}-${item.label}`}>

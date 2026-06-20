@@ -1,0 +1,25 @@
+# XoSoMB.vn robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://xosomb.vn/sitemap.xml
+
+# Google Search Console
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1

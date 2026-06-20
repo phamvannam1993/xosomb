@@ -7,6 +7,11 @@ import { VietlottTabs } from '@/components/vietlott/VietlottTabs';
 import { getAllVietlottProducts } from '@/lib/vietlott/catalog';
 import { getLatestVietlottResult } from '@/lib/vietlott/provider';
 import { absoluteUrl } from '@/lib/site';
+import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
+
+function BreadcrumbListSchema({ schema }: { schema: string }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
+}
 
 export const revalidate = 60;
 
@@ -20,9 +25,16 @@ export default async function VietlottPage() {
   const products = getAllVietlottProducts();
   const results = await Promise.all(products.map((product) => getLatestVietlottResult(product.id)));
 
+  const breadcrumbSchema = generateBreadcrumbListSchema([
+    { name: 'Trang chủ', path: '/' },
+    { name: 'Vietlott', path: '/vietlott' }
+  ]);
+
   return (
-    <LotteryShell>
-      <VietlottTabs />
+    <>
+      <BreadcrumbListSchema schema={breadcrumbSchema} />
+      <LotteryShell>
+        <VietlottTabs />
       <section className="introCard">
         <h1>Kết quả Vietlott hôm nay</h1>
         <p>Tra cứu nhanh kết quả các sản phẩm Vietlott phổ biến: Mega 6/45, Power 6/55, Max 3D và Max 3D Pro.</p>
@@ -42,6 +54,7 @@ export default async function VietlottPage() {
       ) : (
         <DataUnavailable title="Chưa có dữ liệu Vietlott" message="Kết quả Vietlott chưa sẵn sàng. Vui lòng thử lại sau." />
       )}
-    </LotteryShell>
+      </LotteryShell>
+    </>
   );
 }

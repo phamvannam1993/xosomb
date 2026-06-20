@@ -35,10 +35,35 @@ export function ddMmYyyyFromDate(dateValue: string) {
 }
 
 export function normalizeDateFromText(value: string): string | null {
-  const match = value.match(/(?:ngày\s*)?(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/i);
+  const match = value.match(/(?:ngày|ngay)?\s*(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/i);
   if (!match) return null;
-  const [, day, month, rawYear] = match;
+
+  let [, first, second, rawYear] = match;
   const year = rawYear ? (rawYear.length === 2 ? `20${rawYear}` : rawYear) : String(new Date().getFullYear());
+
+  // Xác định day/month: nếu first > 12 thì first là ngày, ngược lại cần kiểm tra context
+  const firstNum = parseInt(first, 10);
+  const secondNum = parseInt(second, 10);
+
+  let day: string, month: string;
+  if (firstNum > 12) {
+    // first chắc chắn là ngày
+    day = first;
+    month = second;
+  } else if (secondNum > 12) {
+    // second chắc chắn là tháng (ko valid)
+    return null;
+  } else {
+    // Cả hai đều có thể là ngày hoặc tháng - assume format là DD/MM
+    day = first;
+    month = second;
+  }
+
+  // Validate
+  const dayNum = parseInt(day, 10);
+  const monthNum = parseInt(month, 10);
+  if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) return null;
+
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 

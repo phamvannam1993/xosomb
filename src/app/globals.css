@@ -1583,3 +1583,10 @@ input[type='date'] {
     min-width: 135px;
   }
 }
+
+.footerColumnTitle {
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 12px 0;
+  display: block;
+}

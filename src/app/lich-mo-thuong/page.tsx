@@ -3,6 +3,11 @@ import { DisclaimerBox } from '@/components/DisclaimerBox';
 import { LotteryShell } from '@/components/LotteryShell';
 import { MarketTabs } from '@/components/MarketTabs';
 import { absoluteUrl } from '@/lib/site';
+import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
+
+function BreadcrumbListSchema({ schema }: { schema: string }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
+}
 
 export const metadata: Metadata = {
   title: 'Lịch mở thưởng xổ số ba miền',
@@ -19,9 +24,16 @@ const scheduleRows = [
 ];
 
 export default function SchedulePage() {
+  const breadcrumbSchema = generateBreadcrumbListSchema([
+    { name: 'Trang chủ', path: '/' },
+    { name: 'Lịch mở thưởng', path: '/lich-mo-thuong' }
+  ]);
+
   return (
-    <LotteryShell>
-      <MarketTabs />
+    <>
+      <BreadcrumbListSchema schema={breadcrumbSchema} />
+      <LotteryShell>
+        <MarketTabs />
       <section className="contentPanel">
         <h1>Lịch mở thưởng xổ số</h1>
         <p className="panelLead">Bảng lịch mở thưởng tham khảo theo từng miền. Khi đối chiếu vé số, nên kiểm tra thêm thông báo từ đơn vị phát hành.</p>
@@ -43,6 +55,7 @@ export default function SchedulePage() {
         </table>
       </section>
       <DisclaimerBox />
-    </LotteryShell>
+      </LotteryShell>
+    </>
   );
 }
