@@ -323,7 +323,7 @@ input {
   box-shadow: var(--shadow);
 }
 
-.sidebarTitle {
+.nav-group-title {
   margin: 0;
   color: #fff;
   background: linear-gradient(90deg, var(--brand-dark), var(--brand), var(--brand-2));
@@ -332,8 +332,8 @@ input {
   line-height: 1.2;
 }
 
-.sidebarTitle a,
-.sidebarTitle span {
+.nav-group-title a,
+.nav-group-title span {
   display: block;
   padding: 10px 12px;
   color: #fff;
@@ -438,11 +438,9 @@ input {
   padding: 16px;
 }
 
-.searchPanel h2,
-.searchPanel .searchPanelTitle,
+.searchPanel .date-picker-title,
 .contentPanel h1,
 .contentPanel h2,
-
 .panelLead,
 .seoText p,
 .contentPanel p {

@@ -27,7 +27,7 @@ function SidebarSection({ title, href, children }: { title: string; href?: strin
 
   return (
     <section className="sidebarSection">
-      <div className="sidebarTitle">{content}</div>
+      <div className="nav-group-title">{content}</div>
       <div className="sidebarBody">{children}</div>
     </section>
   );
