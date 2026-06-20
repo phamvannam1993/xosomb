@@ -7,14 +7,45 @@ import { absoluteUrl, siteConfig } from '@/lib/site';
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
+
   title: {
     default: 'XSMB hôm nay - Kết quả xổ số miền Bắc mới nhất | XoSoMB.vn',
     template: '%s | XoSoMB.vn'
   },
+
   description: siteConfig.description,
+
   alternates: {
     canonical: absoluteUrl('/')
   },
+
+  icons: {
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any'
+      },
+      {
+        url: '/favicon-32x32.png',
+        type: 'image/png',
+        sizes: '32x32'
+      },
+      {
+        url: '/android-chrome-192x192.png',
+        type: 'image/png',
+        sizes: '192x192'
+      }
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        type: 'image/png',
+        sizes: '180x180'
+      }
+    ]
+  },
+
   openGraph: {
     type: 'website',
     url: siteConfig.url,
@@ -23,11 +54,13 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     locale: 'vi_VN'
   },
+
   twitter: {
     card: 'summary_large_image',
     title: 'XSMB hôm nay - Kết quả xổ số miền Bắc mới nhất',
     description: siteConfig.description
   },
+
   robots: {
     index: false,
     follow: false,
@@ -38,6 +71,7 @@ export const metadata: Metadata = {
       'max-snippet': -1
     }
   },
+
   category: 'lottery results'
 };
 
