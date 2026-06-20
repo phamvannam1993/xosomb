@@ -1785,3 +1785,8 @@ input[type='date'] {
     grid-template-columns: 1fr;
   }
 }
+
+.dataNotFoundMessage {
+  color: #666;
+  margin-top: 1rem;
+}

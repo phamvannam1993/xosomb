@@ -59,7 +59,7 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
           <ResultBoard result={latest} />
           {!result && (
             <div className="contentPanel seoText">
-              <p style={{ color: '#666', marginTop: '1rem' }}>
+              <p className="dataNotFoundMessage">
                 Không có dữ liệu cho ngày {date}. Hiển thị kết quả mới nhất từ ngày {latest.date}.
               </p>
             </div>
