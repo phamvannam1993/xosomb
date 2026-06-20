@@ -59,7 +59,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
       <LotteryShell>
         <MarketTabs />
       <section className="searchPanel">
-        <h2>Tra cứu XSMB theo ngày</h2>
+        <div className="searchPanelTitle">Tra cứu XSMB theo ngày</div>
         <DateSearchForm defaultDate={date} code="xsmb" />
       </section>
       {result ? (

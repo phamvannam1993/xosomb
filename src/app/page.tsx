@@ -38,7 +38,7 @@ export default async function HomePage() {
         <MarketTabs />
 
       <section className="searchPanel">
-        <h2>Tra cứu kết quả xổ số theo ngày</h2>
+        <div className="searchPanelTitle">Tra cứu kết quả xổ số theo ngày</div>
         <DateSearchForm defaultDate={latest?.date} code="xsmb" />
       </section>
 
