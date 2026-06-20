@@ -43,14 +43,16 @@ export default async function LotteryCodePage({ params }: PageProps) {
         <DateSearchForm defaultDate={result?.date} code={source.code} />
       </section>
       {result ? (
-        <ResultBoard result={result} />
+        <>
+          <ResultBoard result={result} />
+          {recent.length ? <RecentResults results={recent} /> : null}
+        </>
       ) : (
         <DataUnavailable
           title={`Chưa có dữ liệu ${source.shortName}`}
           message="Kết quả cho đài này chưa sẵn sàng. Vui lòng thử lại sau hoặc chọn một ngày khác để tra cứu."
         />
       )}
-      {recent.length ? <RecentResults results={recent} /> : null}
       <DisclaimerBox />
     </LotteryShell>
   );
