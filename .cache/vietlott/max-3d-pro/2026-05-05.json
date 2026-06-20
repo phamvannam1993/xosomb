@@ -1,0 +1,95 @@
+{
+  "product": "max-3d-pro",
+  "productName": "Xổ số Max 3D Pro",
+  "shortName": "Max 3D Pro",
+  "date": "2026-05-05",
+  "numbers": [
+    "840",
+    "896"
+  ],
+  "rows": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [
+        "840",
+        "896"
+      ],
+      "winners": "0",
+      "prizeValue": "2 tỷ"
+    },
+    {
+      "label": "Phụ ĐB",
+      "numbers": [
+        "896",
+        "840"
+      ],
+      "winners": "1",
+      "prizeValue": "400tr"
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "864",
+        "445",
+        "606",
+        "331"
+      ],
+      "winners": "0",
+      "prizeValue": "30tr"
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "576",
+        "663",
+        "962",
+        "588",
+        "473",
+        "171"
+      ],
+      "winners": "2",
+      "prizeValue": "10tr"
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "030",
+        "873",
+        "504",
+        "073",
+        "025",
+        "202",
+        "867",
+        "975"
+      ],
+      "winners": "6",
+      "prizeValue": "4tr"
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [],
+      "winners": "47",
+      "prizeValue": "1tr",
+      "matchText": "1tr Trùng khớp 2 bộ số bất kỳ của giải ĐB, 1, 2 và 3 47"
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [],
+      "winners": "473",
+      "prizeValue": "100K",
+      "matchText": "100K Trùng khớp 1 trong 2 bộ số của giải ĐB 473"
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [],
+      "winners": "5,362",
+      "prizeValue": "40K",
+      "matchText": "40K: Trùng khớp 1 trong 18 bộ số của giải 1, 2, 3 5,362 21."
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmax3dpro/30-ngay",
+  "updatedAt": "2026-06-20T03:15:22.371Z",
+  "fetchedAt": "2026-06-20T03:15:22.371Z",
+  "dataSource": "html"
+}

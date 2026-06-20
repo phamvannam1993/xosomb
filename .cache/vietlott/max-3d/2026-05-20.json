@@ -1,0 +1,96 @@
+{
+  "product": "max-3d",
+  "productName": "Xổ số Max 3D",
+  "shortName": "Max 3D",
+  "date": "2026-05-20",
+  "numbers": [
+    "029",
+    "468",
+    "226"
+  ],
+  "rows": [
+    {
+      "label": "Đặc biệt",
+      "numbers": [],
+      "winners": "0",
+      "prizeValue": "1tỷ",
+      "matchText": "1tỷ: 0"
+    },
+    {
+      "label": "Giải nhất",
+      "numbers": [
+        "029",
+        "468",
+        "226"
+      ],
+      "prizeValue": "1tr"
+    },
+    {
+      "label": "Giải nhì",
+      "numbers": [
+        "053",
+        "927",
+        "779",
+        "302",
+        "860"
+      ],
+      "prizeValue": "350K"
+    },
+    {
+      "label": "Giải ba",
+      "numbers": [
+        "095",
+        "611",
+        "015",
+        "220",
+        "142",
+        "365",
+        "384"
+      ],
+      "prizeValue": "210K"
+    },
+    {
+      "label": "Giải tư",
+      "numbers": [
+        "124",
+        "967",
+        "061",
+        "831",
+        "619",
+        "320",
+        "122",
+        "504",
+        "202"
+      ],
+      "prizeValue": "100K"
+    },
+    {
+      "label": "Giải năm",
+      "numbers": [
+        "036",
+        "001",
+        "002"
+      ],
+      "prizeValue": "1tr"
+    },
+    {
+      "label": "Giải sáu",
+      "numbers": [
+        "493"
+      ],
+      "prizeValue": "150K"
+    },
+    {
+      "label": "Giải bảy",
+      "numbers": [],
+      "winners": "3,176",
+      "prizeValue": "40K",
+      "matchText": "40K: 3,176 15."
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmax3d/30-ngay",
+  "updatedAt": "2026-06-20T02:43:54.923Z",
+  "fetchedAt": "2026-06-20T02:43:54.923Z",
+  "dataSource": "html"
+}

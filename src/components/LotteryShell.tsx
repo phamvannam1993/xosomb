@@ -6,13 +6,20 @@ const dataUtilities = [
   { label: 'XSMB hôm nay', href: '/xsmb' },
   { label: 'XSMB 30 ngày', href: '/xsmb-30-ngay' },
   { label: 'Thống kê tham khảo', href: '/thong-ke' },
-  { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' }
+  { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
+  { label: 'Kết quả Vietlott', href: '/vietlott' }
 ];
 
 const guideLinks = [
   { label: 'Cách đọc bảng kết quả', href: '/xsmb' },
   { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' },
   { label: 'Lịch quay các miền', href: '/lich-mo-thuong' }
+];
+
+const quayThuLinks = [
+  { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
+  { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
+  { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
 ];
 
 function SidebarSection({ title, href, children }: { title: string; href?: string; children: ReactNode }) {
@@ -47,6 +54,13 @@ function LeftSidebar() {
         <ListLink href="/lich-mo-thuong" label="Lịch mở thưởng" />
       </SidebarSection>
 
+      <SidebarSection title="Vietlott" href="/vietlott">
+        <ListLink href="/vietlott/mega-645" label="Mega 6/45" />
+        <ListLink href="/vietlott/power-655" label="Power 6/55" />
+        <ListLink href="/vietlott/max-3d" label="Max 3D" />
+        <ListLink href="/vietlott/max-3d-pro" label="Max 3D Pro" />
+      </SidebarSection>
+
       <SidebarSection title="Xổ số miền Nam" href="/xsmn">
         {south.slice(0, 20).map((province) => (
           <ListLink key={province.code} href={`/${province.code}`} label={province.name.replace(/^Xổ số\s+/i, '')} />
@@ -74,6 +88,12 @@ function RightSidebar() {
       <SidebarSection title="Công cụ tra cứu">
         {dataUtilities.map((item) => (
           <ListLink key={item.label} href={item.href} label={item.label} />
+        ))}
+      </SidebarSection>
+
+      <SidebarSection title="Quay thử xổ số" href="/quay-thu-xsmb">
+        {quayThuLinks.map((item) => (
+          <ListLink key={item.label} href={item.href} label={item.label} rel="nofollow" />
         ))}
       </SidebarSection>
 

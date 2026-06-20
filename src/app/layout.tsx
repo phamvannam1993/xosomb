@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import './globals.css';
 import { absoluteUrl, siteConfig } from '@/lib/site';
@@ -7,45 +6,22 @@ import { absoluteUrl, siteConfig } from '@/lib/site';
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
-
   title: {
     default: 'XSMB hôm nay - Kết quả xổ số miền Bắc mới nhất | XoSoMB.vn',
     template: '%s | XoSoMB.vn'
   },
-
   description: siteConfig.description,
-
   alternates: {
     canonical: absoluteUrl('/')
   },
-
   icons: {
     icon: [
-      {
-        url: '/favicon.ico',
-        sizes: 'any'
-      },
-      {
-        url: '/favicon-32x32.png',
-        type: 'image/png',
-        sizes: '32x32'
-      },
-      {
-        url: '/android-chrome-192x192.png',
-        type: 'image/png',
-        sizes: '192x192'
-      }
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' }
     ],
     shortcut: '/favicon.ico',
-    apple: [
-      {
-        url: '/apple-touch-icon.png',
-        type: 'image/png',
-        sizes: '180x180'
-      }
-    ]
+    apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }]
   },
-
   openGraph: {
     type: 'website',
     url: siteConfig.url,
@@ -54,33 +30,84 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     locale: 'vi_VN'
   },
-
   twitter: {
     card: 'summary_large_image',
     title: 'XSMB hôm nay - Kết quả xổ số miền Bắc mới nhất',
     description: siteConfig.description
   },
-
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
     googleBot: {
-      index: false,
-      follow: false,
+      index: true,
+      follow: true,
       'max-image-preview': 'large',
       'max-snippet': -1
     }
   },
-
   category: 'lottery results'
 };
 
 const navLinks = [
   { label: 'Trang chủ', href: '/' },
-  { label: 'XSMB', href: '/xsmb' },
-  { label: 'XSMN', href: '/xsmn' },
-  { label: 'XSMT', href: '/xsmt' },
-  { label: 'Sổ kết quả', href: '/xsmb-30-ngay' },
+  {
+    label: 'XSMB',
+    href: '/xsmb',
+    children: [
+      { label: 'XSMB hôm nay', href: '/xsmb' },
+      { label: 'XSMB 30 ngày', href: '/xsmb-30-ngay' },
+      { label: 'Lịch mở thưởng miền Bắc', href: '/lich-mo-thuong' }
+    ]
+  },
+  {
+    label: 'XSMN',
+    href: '/xsmn',
+    children: [
+      { label: 'KQXSMN hôm nay', href: '/xsmn' },
+      { label: 'Xổ số Đồng Tháp', href: '/xsdt' },
+      { label: 'Xổ số Bình Dương', href: '/xsbd' },
+      { label: 'Xổ số Hồ Chí Minh', href: '/xshcm' }
+    ]
+  },
+  {
+    label: 'XSMT',
+    href: '/xsmt',
+    children: [
+      { label: 'KQXSMT hôm nay', href: '/xsmt' },
+      { label: 'Xổ số Đà Nẵng', href: '/xsdng' },
+      { label: 'Xổ số Gia Lai', href: '/xsgl' },
+      { label: 'Xổ số Ninh Thuận', href: '/xsnt' }
+    ]
+  },
+  {
+    label: 'Vietlott',
+    href: '/vietlott',
+    children: [
+      { label: 'Xổ số Vietlott', href: '/vietlott' },
+      { label: 'Mega 6/45', href: '/vietlott/mega-645' },
+      { label: 'Power 6/55', href: '/vietlott/power-655' },
+      { label: 'Max 3D', href: '/vietlott/max-3d' },
+      { label: 'Max 3D Pro', href: '/vietlott/max-3d-pro' }
+    ]
+  },
+  {
+    label: 'Sổ kết quả',
+    href: '/xsmb-30-ngay',
+    children: [
+      { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
+      { label: 'XSMB hôm nay', href: '/xsmb' },
+      { label: 'Thống kê tham khảo', href: '/thong-ke' }
+    ]
+  },
+  {
+    label: 'Quay thử',
+    href: '/quay-thu-xsmb',
+    children: [
+      { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
+      { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
+      { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
+    ]
+  },
   { label: 'Thống kê', href: '/thong-ke' },
   { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' }
 ];
@@ -93,7 +120,8 @@ const footerColumns = [
       { label: 'Xổ số miền Trung', href: '/xsmt' },
       { label: 'Xổ số miền Nam', href: '/xsmn' },
       { label: 'Xổ số Đồng Tháp', href: '/xsdt' },
-      { label: 'Xổ số Bình Dương', href: '/xsbd' }
+      { label: 'Xổ số Bình Dương', href: '/xsbd' },
+      { label: 'Kết quả Vietlott', href: '/vietlott' }
     ]
   },
   {
@@ -101,7 +129,8 @@ const footerColumns = [
     links: [
       { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
       { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
-      { label: 'Tra cứu XSMB hôm nay', href: '/xsmb' }
+      { label: 'Tra cứu XSMB hôm nay', href: '/xsmb' },
+      { label: 'Kết quả Vietlott', href: '/vietlott' }
     ]
   },
   {
@@ -127,7 +156,8 @@ const keywordLinks = [
   { label: 'xổ số miền Bắc', href: '/xsmb' },
   { label: 'kết quả xsmb', href: '/xsmb' },
   { label: 'xsmb 30 ngày', href: '/xsmb-30-ngay' },
-  { label: 'lịch mở thưởng', href: '/lich-mo-thuong' }
+  { label: 'lịch mở thưởng', href: '/lich-mo-thuong' },
+  { label: 'vietlott hôm nay', href: '/vietlott' }
 ];
 
 const jsonLd = {
@@ -145,19 +175,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body id="top">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-0SJ6BCCVGN"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-0SJ6BCCVGN');
-          `}
-        </Script>
-
         <header className="siteHeader">
           <div className="container headerInner">
             <Link href="/" className="logo" aria-label="XoSoMB.vn trang chủ">
@@ -171,10 +188,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="todayPill">Cập nhật hằng ngày</div>
           </div>
           <nav className="navBar" aria-label="Điều hướng chính">
-            <div className="container navInner">
-              {navLinks.map((item) => (
-                <Link href={item.href} key={item.href}>{item.label}</Link>
-              ))}
+            <div className="container">
+              <ul className="navMenu">
+                {navLinks.map((item) => (
+                  <li className={`navItem ${item.children ? 'hasDropdown' : ''}`} key={item.href}>
+                    <Link className="navLink" href={item.href}>
+                      <span>{item.label}</span>
+                      {item.children ? <span className="navCaret" aria-hidden="true">▾</span> : null}
+                    </Link>
+                    {item.children ? (
+                      <ul className="navDropdown" aria-label={`${item.label} menu`}>
+                        {item.children.map((child) => (
+                          <li key={`${item.href}-${child.href}-${child.label}`}>
+                            <Link href={child.href}>{child.label}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
             </div>
           </nav>
         </header>
@@ -211,6 +244,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="footerAbout">
                 <p><strong>{siteConfig.domain}</strong> - Trang tra cứu kết quả xổ số miền Bắc và kết quả xổ số theo tỉnh.</p>
                 <p>Dữ liệu được trình bày để tham khảo, cập nhật thường xuyên và hỗ trợ người dùng xem lại kết quả theo ngày.</p>
+                <p>Website không bán vé, không mua hộ vé và không nhận đặt cược dưới mọi hình thức.</p>
               </div>
 
               <div className="footerRight">

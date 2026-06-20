@@ -100,6 +100,24 @@ function completeList(results: LotteryResult[], limit?: number) {
   return typeof limit === 'number' ? complete.slice(0, limit) : complete;
 }
 
+function mergeLotteryResults(...groups: LotteryResult[][]) {
+  const byDate = new Map<string, LotteryResult>();
+
+  for (const result of groups.flat().filter(isCompleteLotteryResult)) {
+    const current = byDate.get(result.date) || null;
+    byDate.set(result.date, pickBetterLotteryResult(current, result)!);
+  }
+
+  return Array.from(byDate.values()).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+async function fetchLotteryFromRecentHistory(code: string, date: string, limit = 60) {
+  const source = resolveSource(code);
+  const history = completeList(await fetchRecentLotteryFromHtml(source, limit).catch(() => []));
+  if (history.length) await writeCachedResults(history);
+  return history.find((item) => item.date === date) || null;
+}
+
 export async function getLotteryResult(code = 'xsmb', date?: string): Promise<LotteryResult | null> {
   const source = resolveSource(code);
   const normalizedDate = normalizeDate(date);
@@ -123,6 +141,15 @@ export async function getLotteryResult(code = 'xsmb', date?: string): Promise<Lo
   if (mode === 'html' || mode === 'auto' || mode === 'rss') {
     const fromHtml = await fetchLotteryFromHtml(source, normalizedDate).catch(() => null);
     best = pickBetterLotteryResult(best, fromHtml);
+    if (isCompleteLotteryResult(best)) {
+      await writeCachedResult(best);
+      return best;
+    }
+
+    // Một số trang ngày lẻ có thể không parse đủ,
+    // nhưng trang 30 ngày vẫn có kết quả. Dùng trang lịch sử để lấp đúng ngày.
+    const fromHistory = await fetchLotteryFromRecentHistory(source.code, normalizedDate).catch(() => null);
+    best = pickBetterLotteryResult(best, fromHistory);
     if (isCompleteLotteryResult(best)) {
       await writeCachedResult(best);
       return best;
@@ -195,31 +222,31 @@ export async function getRecentLotteryResults(code = 'xsmb', limit = 30): Promis
 
   if (mode === 'mock') return mockRecentByCode(source.code, limit);
 
+  const groups: LotteryResult[][] = [];
+
   if (mode === 'api' || mode === 'auto') {
-    const history = await fetchHistoryFromExternalApi(source.code, limit).catch(() => []);
-    const completeHistory = completeList(history, limit);
-    if (completeHistory.length) {
-      await writeCachedResults(completeHistory);
-      return completeHistory;
-    }
+    const history = completeList(await fetchHistoryFromExternalApi(source.code, limit).catch(() => []), limit);
+    if (history.length) groups.push(history);
   }
 
   if (mode === 'html' || mode === 'auto' || mode === 'rss') {
-    const historyFromHtml = await fetchRecentLotteryFromHtml(source, limit).catch(() => []);
-    const completeHistoryFromHtml = completeList(historyFromHtml, limit);
-    if (completeHistoryFromHtml.length) {
-      await writeCachedResults(completeHistoryFromHtml);
-      return completeHistoryFromHtml;
-    }
+    const historyFromHtml = completeList(await fetchRecentLotteryFromHtml(source, limit).catch(() => []), limit);
+    if (historyFromHtml.length) groups.push(historyFromHtml);
   }
 
   if (mode === 'rss' || mode === 'auto') {
     const rssResults = completeList(await fetchRssAndCache(source.code).catch(() => []), limit);
-    if (rssResults.length) return rssResults;
+    if (rssResults.length) groups.push(rssResults);
   }
 
-  const cached = await readRecentCachedResults(source.code, limit);
-  if (cached.length) return cached;
+  const cached = completeList(await readRecentCachedResults(source.code, limit), limit);
+  if (cached.length) groups.push(cached);
+
+  const merged = mergeLotteryResults(...groups).slice(0, limit);
+  if (merged.length) {
+    await writeCachedResults(merged);
+    return merged;
+  }
 
   return allowMockFallback() ? completeList(mockRecentByCode(source.code, limit), limit) : [];
 }

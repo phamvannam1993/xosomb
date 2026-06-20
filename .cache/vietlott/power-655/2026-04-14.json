@@ -1,0 +1,47 @@
+{
+  "product": "power-655",
+  "productName": "Xổ số Power 6/55",
+  "shortName": "Power 6/55",
+  "date": "2026-04-14",
+  "numbers": [
+    "08",
+    "16",
+    "22",
+    "35",
+    "39",
+    "47"
+  ],
+  "bonusNumber": "28",
+  "rows": [
+    {
+      "label": "Jackpot 1",
+      "winners": "0",
+      "prizeValue": "87,796,064,550"
+    },
+    {
+      "label": "Jackpot 2",
+      "winners": "2",
+      "prizeValue": "2,077,583,500"
+    },
+    {
+      "label": "Giải nhất",
+      "winners": "23",
+      "prizeValue": "40,000,000"
+    },
+    {
+      "label": "Giải nhì",
+      "winners": "1,218",
+      "prizeValue": "500,000"
+    },
+    {
+      "label": "Giải ba",
+      "winners": "25,845",
+      "prizeValue": "50,000"
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xspower/30-ngay",
+  "updatedAt": "2026-06-20T02:43:57.338Z",
+  "fetchedAt": "2026-06-20T02:43:57.338Z",
+  "dataSource": "html"
+}

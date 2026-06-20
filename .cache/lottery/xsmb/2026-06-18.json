@@ -2,7 +2,7 @@
   "date": "2026-06-18",
   "code": "xsmb",
   "region": "north",
-  "province": "miền Bắc",
+  "province": "Miền Bắc",
   "shortName": "XSMB",
   "scheme": "north",
   "specialPrize": "15032",
@@ -75,9 +75,9 @@
       ]
     }
   ],
-  "sourceName": "XSKT HTML",
-  "sourceUrl": "https://xskt.com.vn/xsmb/30-ngay",
-  "updatedAt": "2026-06-19T16:23:46.189Z",
-  "fetchedAt": "2026-06-19T16:23:46.189Z",
-  "dataSource": "html"
+  "sourceName": "XSKT RSS",
+  "sourceUrl": "https://xskt.com.vn/xsmb/ngay-18-6-2026",
+  "updatedAt": "2026-06-19T18:28:05.263Z",
+  "fetchedAt": "2026-06-20T02:59:46.449Z",
+  "dataSource": "api"
 }

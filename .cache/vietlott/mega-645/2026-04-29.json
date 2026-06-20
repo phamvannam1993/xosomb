@@ -1,0 +1,41 @@
+{
+  "product": "mega-645",
+  "productName": "Xổ số Mega 6/45",
+  "shortName": "Mega 6/45",
+  "date": "2026-04-29",
+  "numbers": [
+    "04",
+    "14",
+    "15",
+    "16",
+    "17",
+    "25"
+  ],
+  "rows": [
+    {
+      "label": "Jackpot",
+      "winners": "0",
+      "prizeValue": "15,047,545,500"
+    },
+    {
+      "label": "Giải nhất",
+      "winners": "27",
+      "prizeValue": "10,000,000"
+    },
+    {
+      "label": "Giải nhì",
+      "winners": "917",
+      "prizeValue": "300,000"
+    },
+    {
+      "label": "Giải ba",
+      "winners": "16,037",
+      "prizeValue": "30,000"
+    }
+  ],
+  "sourceName": "XSKT HTML",
+  "sourceUrl": "https://xskt.com.vn/xsmega645/30-ngay",
+  "updatedAt": "2026-06-20T02:43:58.467Z",
+  "fetchedAt": "2026-06-20T02:43:58.467Z",
+  "dataSource": "html"
+}
