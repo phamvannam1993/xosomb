@@ -39,7 +39,7 @@ export default async function LotteryCodePage({ params }: PageProps) {
     <LotteryShell>
       <MarketTabs />
       <section className="searchPanel">
-        <h2>Chọn ngày xem {source.shortName}</h2>
+        <div className="searchPanelTitle">Chọn ngày xem {source.shortName}</div>
         <DateSearchForm defaultDate={result?.date} code={source.code} />
       </section>
       {result ? (

@@ -37,7 +37,7 @@ export default async function XsmbTodayPage() {
       <LotteryShell>
         <MarketTabs />
       <section className="searchPanel">
-        <h2>Chọn ngày xem XSMB</h2>
+        <div className="searchPanelTitle">Chọn ngày xem XSMB</div>
         <DateSearchForm defaultDate={result?.date} code="xsmb" />
       </section>
       {result ? <ResultBoard result={result} /> : <DataUnavailable />}
