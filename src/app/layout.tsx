@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Script from 'next/script';
 import './globals.css';
 import { absoluteUrl, siteConfig } from '@/lib/site';
 
@@ -259,6 +260,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <a href="#top" className="backToTop" aria-label="Lên đầu trang">⌃</a>
         </footer>
+
+        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
