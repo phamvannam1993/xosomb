@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/lib/site';
+import { todayInVietnam } from '@/lib/lottery/format';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayInVietnam();
 
   // Tính ngày 30 ngày trước
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)

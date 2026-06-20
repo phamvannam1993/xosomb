@@ -7,7 +7,7 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { getLotterySource } from '@/lib/lottery/catalog';
-import { isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
+import { isYyyyMmDd, toVietnameseDate, todayInVietnam } from '@/lib/lottery/format';
 import { getLotteryResult } from '@/lib/lottery/provider';
 import { absoluteUrl } from '@/lib/site';
 
@@ -18,7 +18,7 @@ type PageProps = { params: Promise<{ code: string; date: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { code, date } = await params;
   const source = getLotterySource(code);
-  if (!source || !isYyyyMmDd(date)) return { title: 'Không tìm thấy dữ liệu', robots: { index: false, follow: true } };
+  if (!source || !isYyyyMmDd(date) || date > todayInVietnam()) return { title: 'Không tìm thấy dữ liệu', robots: { index: false, follow: false } };
 
   const result = await getLotteryResult(source.code, date).catch(() => null);
   const canonical = absoluteUrl(`/${source.code}/${date}`);
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LotteryCodeDatePage({ params }: PageProps) {
   const { code, date } = await params;
   const source = getLotterySource(code);
-  if (!source || !isYyyyMmDd(date)) notFound();
+  if (!source || !isYyyyMmDd(date) || date > todayInVietnam()) notFound();
 
   const result = await getLotteryResult(source.code, date);
 

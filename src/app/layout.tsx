@@ -152,15 +152,6 @@ const footerColumns = [
   }
 ];
 
-const keywordLinks = [
-  { label: 'xsmb', href: '/xsmb' },
-  { label: 'xổ số miền Bắc', href: '/xsmb' },
-  { label: 'kết quả xsmb', href: '/xsmb' },
-  { label: 'xsmb 30 ngày', href: '/xsmb-30-ngay' },
-  { label: 'lịch mở thưởng', href: '/lich-mo-thuong' },
-  { label: 'vietlott hôm nay', href: '/vietlott' }
-];
-
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -230,15 +221,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </ul>
                 </section>
               ))}
-            </div>
-
-            <div className="footerKeywords" aria-label="Từ khóa tìm kiếm phổ biến">
-              <span>Từ khóa tìm kiếm:</span>
-              <div>
-                {keywordLinks.map((item) => (
-                  <Link href={item.href} key={item.label}>{item.label}</Link>
-                ))}
-              </div>
             </div>
 
             <div className="footerBottom">
