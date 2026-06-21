@@ -105,6 +105,17 @@ const navLinks = [
   { label: 'Dò vé', href: '/do-ve-so' },
   { label: 'In vé dò', href: '/in-ve-do' },
   {
+    label: 'Thông tin',
+    href: '/gioi-thieu',
+    children: [
+      { label: 'Giới thiệu', href: '/gioi-thieu' },
+      { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+      { label: 'Chính sách cập nhật', href: '/chinh-sach-cap-nhat-ket-qua' },
+      { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' },
+      { label: 'Liên hệ', href: '/lien-he' }
+    ]
+  },
+  {
     label: 'Quay thử',
     href: '/quay-thu-xsmb',
     children: [
@@ -146,16 +157,21 @@ const footerColumns = [
       { label: 'Cách đọc bảng kết quả', href: '/xsmb' },
       { label: 'Dò vé số online', href: '/do-ve-so' },
       { label: 'In vé dò', href: '/in-ve-do' },
+      { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+      { label: 'Chính sách cập nhật', href: '/chinh-sach-cap-nhat-ket-qua' },
       { label: 'Bảng lô tô 2 số cuối', href: '/thong-ke' },
       { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' }
     ]
   },
   {
-    title: 'Thống kê',
+    title: 'Thông tin',
     links: [
-      { label: 'Thống kê tham khảo', href: '/thong-ke' },
-      { label: 'XSMB 30 ngày', href: '/xsmb-30-ngay' },
-      { label: 'Lịch quay theo miền', href: '/lich-mo-thuong' }
+      { label: 'Giới thiệu', href: '/gioi-thieu' },
+      { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+      { label: 'Chính sách cập nhật', href: '/chinh-sach-cap-nhat-ket-qua' },
+      { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' },
+      { label: 'Liên hệ', href: '/lien-he' },
+      { label: 'Thống kê tham khảo', href: '/thong-ke' }
     ]
   }
 ];

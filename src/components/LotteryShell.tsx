@@ -9,7 +9,9 @@ const dataUtilities = [
   { label: 'In vé dò', href: '/in-ve-do' },
   { label: 'Thống kê tham khảo', href: '/thong-ke' },
   { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
-  { label: 'Kết quả Vietlott', href: '/vietlott' }
+  { label: 'Kết quả Vietlott', href: '/vietlott' },
+  { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+  { label: 'Liên hệ', href: '/lien-he' }
 ];
 
 const guideLinks = [
@@ -17,7 +19,9 @@ const guideLinks = [
   { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' },
   { label: 'Dò vé số online', href: '/do-ve-so' },
   { label: 'In phiếu dò kết quả', href: '/in-ve-do' },
-  { label: 'Lịch quay các miền', href: '/lich-mo-thuong' }
+  { label: 'Lịch quay các miền', href: '/lich-mo-thuong' },
+  { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+  { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' }
 ];
 
 const quayThuLinks = [
@@ -105,6 +109,12 @@ function RightSidebar() {
         {guideLinks.map((item) => (
           <ListLink key={item.label} href={item.href} label={item.label} />
         ))}
+      </SidebarSection>
+
+      <SidebarSection title="Thông tin website" href="/gioi-thieu">
+        <ListLink href="/gioi-thieu" label="Giới thiệu" />
+        <ListLink href="/chinh-sach-cap-nhat-ket-qua" label="Chính sách cập nhật" />
+        <ListLink href="/lien-he" label="Liên hệ" />
       </SidebarSection>
 
       <section className="scheduleCard">
