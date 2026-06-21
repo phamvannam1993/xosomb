@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { VietlottResult } from '@/lib/vietlott/types';
-import { toVietnameseDate } from '@/lib/vietlott/format';
+import { ddMmYyyyFromDate, toVietnameseDate } from '@/lib/vietlott/format';
 
 function productHref(result: VietlottResult) {
   return `/vietlott/${result.product}`;
@@ -18,7 +18,7 @@ export function VietlottBoard({ result, headingLevel = 1 }: { result: VietlottRe
         <p>
           <Link href="/vietlott">Vietlott</Link> /{' '}
           <Link href={productHref(result)}>{result.shortName}</Link> /{' '}
-          <Link href={`${productHref(result)}/${result.date}`}>{result.shortName} {result.date}</Link> / {toVietnameseDate(result.date)}
+          <Link href={`${productHref(result)}/${result.date}`}>Kết quả ngày {ddMmYyyyFromDate(result.date)}</Link> / {toVietnameseDate(result.date)}
         </p>
         <div className="vietlottMeta">
           {result.drawId ? <span>Kỳ quay: #{result.drawId}</span> : null}

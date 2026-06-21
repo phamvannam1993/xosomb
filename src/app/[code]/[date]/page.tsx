@@ -7,7 +7,7 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { getLotterySource } from '@/lib/lottery/catalog';
-import { isFutureDate, isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
+import { dateTextForSeo, ddMmYyyyFromDate, isFutureDate, isYyyyMmDd } from '@/lib/lottery/format';
 import { createLivePlaceholderResult, getLiveDrawWindow, toLiveLotteryResult } from '@/lib/lottery/live';
 import { getLotteryResult, getLatestLotteryResult } from '@/lib/lottery/provider';
 import { absoluteUrl } from '@/lib/site';
@@ -23,19 +23,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const result = await getLotteryResult(source.code, date).catch(() => null);
   const canonical = absoluteUrl(`/${source.code}/${date}`);
+  const dateLabel = dateTextForSeo(date);
 
   if (!result) {
     return {
-      title: `Chưa có dữ liệu ${source.shortName} ${date}`,
-      description: `Trang tra cứu ${source.shortName} ngày ${date}. Kết quả ngày này hiện chưa sẵn sàng để hiển thị.`,
+      title: `Chưa có dữ liệu ${source.shortName} ${dateLabel}`,
+      description: `Trang tra cứu ${source.shortName} ${dateLabel}. Kết quả ngày này hiện chưa sẵn sàng để hiển thị.`,
       robots: { index: false, follow: true },
       alternates: { canonical }
     };
   }
 
   return {
-    title: `${source.shortName} ${date} - Kết quả ${source.name.replace(/^Xổ số\s+/i, '')} ${toVietnameseDate(date)}`,
-    description: `Tra cứu ${source.shortName} ngày ${date}: bảng kết quả đầy đủ theo giải và lô tô đầu đuôi 2 số cuối.`,
+    title: `${source.shortName} ${dateLabel} - Kết quả ${source.name.replace(/^Xổ số\s+/i, '')}`,
+    description: `Tra cứu ${source.shortName} ${dateLabel}: bảng kết quả đầy đủ theo giải và lô tô đầu đuôi 2 số cuối.`,
     alternates: { canonical }
   };
 }
@@ -72,7 +73,7 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
           {!result && !liveBoardResult && (
             <div className="contentPanel seoText">
               <p className="dataNotFoundMessage">
-                Không có dữ liệu cho ngày {date}. Hiển thị kết quả mới nhất từ ngày {latest.date}.
+                Không có dữ liệu cho ngày {ddMmYyyyFromDate(date)}. Hiển thị kết quả mới nhất từ ngày {ddMmYyyyFromDate(latest.date)}.
               </p>
             </div>
           )}

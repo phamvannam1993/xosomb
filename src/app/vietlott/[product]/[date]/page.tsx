@@ -5,7 +5,7 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { VietlottBoard } from '@/components/vietlott/VietlottBoard';
 import { VietlottTabs } from '@/components/vietlott/VietlottTabs';
 import { getVietlottProduct } from '@/lib/vietlott/catalog';
-import { isFutureDate, isYyyyMmDd } from '@/lib/vietlott/format';
+import { dateTextForSeo, isFutureDate, isYyyyMmDd } from '@/lib/vietlott/format';
 import { getVietlottResult } from '@/lib/vietlott/provider';
 import { absoluteUrl } from '@/lib/site';
 
@@ -20,9 +20,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const result = await getVietlottResult(product.id, date);
 
+  const dateLabel = dateTextForSeo(date);
+
   return {
-    title: `${product.shortName} ${date} - Kết quả ${product.name}`,
-    description: `Tra cứu kết quả ${product.shortName} ngày ${date}, dãy số trúng thưởng và thống kê giải.`,
+    title: `${product.shortName} ${dateLabel} - Kết quả ${product.name}`,
+    description: `Tra cứu kết quả ${product.shortName} ${dateLabel}, dãy số trúng thưởng và thống kê giải.`,
     alternates: { canonical: absoluteUrl(`/vietlott/${product.id}/${date}`) },
     robots: result ? { index: true, follow: true } : { index: false, follow: true }
   };
@@ -41,7 +43,7 @@ export default async function VietlottDatePage({ params }: PageProps) {
       {result ? (
         <VietlottBoard result={result} />
       ) : (
-        <DataUnavailable title={`Chưa có dữ liệu ${product.shortName} ${date}`} message="Kết quả ngày này chưa sẵn sàng. Vui lòng chọn ngày quay thưởng khác hoặc quay lại sau." />
+        <DataUnavailable title={`Chưa có dữ liệu ${product.shortName} ${dateTextForSeo(date)}`} message="Kết quả ngày này chưa sẵn sàng. Vui lòng chọn ngày quay thưởng khác hoặc quay lại sau." />
       )}
     </LotteryShell>
   );

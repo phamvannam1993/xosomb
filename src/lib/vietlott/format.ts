@@ -74,6 +74,15 @@ export function toVietnameseDate(date: string) {
   }).format(d);
 }
 
+export function ddMmYyyyFromDate(dateValue: string) {
+  const [year, month, day] = dateValue.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+export function dateTextForSeo(dateValue: string) {
+  return isYyyyMmDd(dateValue) ? `ngày ${ddMmYyyyFromDate(dateValue)}` : `ngày ${dateValue}`;
+}
+
 export function extractMoneyLikeValues(text: string) {
   return Array.from(text.matchAll(/\b\d{1,3}(?:[,.]\d{3})+(?:\s*(?:đ|đồng|vnđ|VNĐ))?\b/g)).map((m) => m[0]);
 }

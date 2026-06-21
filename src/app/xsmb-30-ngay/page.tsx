@@ -59,7 +59,7 @@ export default async function XsmbThirtyDaysPage() {
         <p>
           Danh sách trên hiển thị tất cả kết quả 30 ngày gần nhất. Bảng chi tiết dưới đây là kết quả mới nhất.{' '}
           <strong>Nhấp vào bất kỳ ngày nào trong danh sách</strong> để xem bảng kết quả đầy đủ cho ngày đó (ví dụ:{' '}
-          <Link href="/xsmb/2026-06-19">/xsmb/2026-06-19</Link>).
+          <Link href="/xsmb/2026-06-19">kết quả ngày 19/06/2026</Link>).
         </p>
         <p>
           Mỗi ngày có một trang riêng với đường dẫn cố định, giúp bạn dễ dàng lưu và chia sẻ kết quả.

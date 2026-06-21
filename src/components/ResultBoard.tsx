@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { LiveDrawWindow, LotteryLiveResult, LotteryResult, PrizeRow, PrizeSchemeId, PrizeSpec } from '@/lib/lottery/types';
-import { buildHeadTailTable, toVietnameseDate } from '@/lib/lottery/format';
+import { buildHeadTailTable, ddMmYyyyFromDate, toVietnameseDate } from '@/lib/lottery/format';
 import { getPrizeSpecs, getShortPrizeLabel } from '@/lib/lottery/schemes';
 
 type DisplayMode = 'all' | 'last2' | 'last3';
@@ -268,6 +268,7 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
     updatedAt: displayUpdatedAt
   });
   const dateText = toVietnameseDate(displayDate);
+  const displayDateText = ddMmYyyyFromDate(displayDate);
   const HeadingTag = headingLevel === 1 ? 'h1' : 'h2';
   const updatedAtText = formatUpdatedAt(displayUpdatedAt);
   const liveStatus = liveStatusText(liveResult, currentPosition, result.scheme, isChecking);
@@ -283,7 +284,7 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
               </HeadingTag>
               <p>
                 <Link href={`/${result.code}`}>{result.shortName}</Link> /{' '}
-                <Link href={`/${result.code}/${displayDate}`}>{result.shortName} {displayDate}</Link> / {dateText}
+                <Link href={`/${result.code}/${displayDate}`}>Kết quả ngày {displayDateText}</Link> / {dateText}
               </p>
             </th>
           </tr>

@@ -57,6 +57,10 @@ export function ddMmYyyyFromDate(dateValue: string) {
   return `${day}/${month}/${year}`;
 }
 
+export function dateTextForSeo(dateValue: string) {
+  return isYyyyMmDd(dateValue) ? `ngày ${ddMmYyyyFromDate(dateValue)}` : `ngày ${dateValue}`;
+}
+
 export function normalizeDateFromText(value: string): string | null {
   const match = value.match(/(?:ngày|ngay)?\s*(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/i);
   if (!match) return null;

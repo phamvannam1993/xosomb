@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { absoluteUrl, siteConfig } from './site';
+import { dateTextForSeo } from './lottery/format';
 
 interface MetadataOptions {
   title?: string;
@@ -67,7 +68,7 @@ export function generateLotteryMetadata(
   vietnameseDate?: string,
   date?: string
 ): Metadata {
-  const dateText = date ? ` ${date}` : ' hôm nay';
+  const dateText = date ? ` ${dateTextForSeo(date)}` : ' hôm nay';
   const vietnameseDateText = vietnameseDate ? ` ${vietnameseDate}` : '';
   const title = `${shortName}${dateText} - Kết quả xổ số`;
   const description = `Tra cứu kết quả xổ số${vietnameseDateText}: giải đặc biệt, các giải đầy đủ và bảng lô tô 2 số cuối.`;
@@ -91,7 +92,7 @@ export function generateVietlottMetadata(
   };
 
   const productName = productNames[product] || product;
-  const dateText = date ? ` - ${date}` : ' hôm nay';
+  const dateText = date ? ` - ${dateTextForSeo(date)}` : ' hôm nay';
   const title = `${productName}${dateText} - Kết quả Vietlott`;
   const description = `Xem kết quả ${productName}${dateText} - Xổ số Vietlott với tất cả giải thưởng.`;
 
