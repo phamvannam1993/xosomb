@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { LiveDrawWindow, LotteryLiveResult, LotteryResult, PrizeRow, PrizeSchemeId, PrizeSpec } from '@/lib/lottery/types';
 import { buildHeadTailTable, ddMmYyyyFromDate, toVietnameseDate } from '@/lib/lottery/format';
@@ -217,6 +217,18 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
   const [isChecking, setIsChecking] = useState(false);
   const [lastCheckedAt, setLastCheckedAt] = useState<string | null>(null);
   const [liveError, setLiveError] = useState<string | null>(null);
+  const isMountedRef = useRef(false);
+  const liveAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      liveAbortRef.current?.abort();
+      liveAbortRef.current = null;
+    };
+  }, []);
 
   const prizeSpecs = useMemo(() => getPrizeSpecs(result.scheme), [result.scheme]);
   const currentPosition = useMemo(() => inferCurrentPosition(liveResult, result.scheme), [liveResult, result.scheme]);
@@ -224,24 +236,36 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
   const shouldPoll = Boolean(isLiveMode && !liveResult?.isComplete && currentWindow?.date);
 
   const fetchLiveResult = useCallback(async () => {
-    if (!live || !currentWindow?.date) return;
+    if (!live || !currentWindow?.date || !isMountedRef.current) return;
+
+    liveAbortRef.current?.abort();
+    const controller = new AbortController();
+    liveAbortRef.current = controller;
 
     setIsChecking(true);
     setLiveError(null);
 
     try {
       const params = new URLSearchParams({ code: live.code, date: currentWindow.date, t: String(Date.now()) });
-      const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store' });
+      const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store', signal: controller.signal });
       const payload = (await response.json()) as LiveApiPayload;
+
+      if (!isMountedRef.current || controller.signal.aborted) return;
 
       if (payload.liveWindow) setCurrentWindow(payload.liveWindow);
       if (!response.ok) throw new Error(payload.error || 'Không kiểm tra được dữ liệu live');
       if (payload.data) setLiveResult(payload.data);
       setLastCheckedAt(new Date().toISOString());
     } catch (error) {
+      if (!isMountedRef.current || controller.signal.aborted) return;
       setLiveError(error instanceof Error ? error.message : 'Không kiểm tra được dữ liệu live');
     } finally {
-      setIsChecking(false);
+      if (isMountedRef.current && !controller.signal.aborted) {
+        setIsChecking(false);
+      }
+      if (liveAbortRef.current === controller) {
+        liveAbortRef.current = null;
+      }
     }
   }, [currentWindow?.date, live]);
 

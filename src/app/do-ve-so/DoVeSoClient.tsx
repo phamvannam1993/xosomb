@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 
 type SourceOption = {
@@ -71,6 +71,18 @@ export default function DoVeSoClient({ sources, today }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [response, setResponse] = useState<CheckResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const isMountedRef = useRef(false);
+  const submitAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      submitAbortRef.current?.abort();
+      submitAbortRef.current = null;
+    };
+  }, []);
 
   const groupedSources = useMemo(() => {
     const groups = new Map<string, SourceOption[]>();
@@ -89,6 +101,11 @@ export default function DoVeSoClient({ sources, today }: Props) {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    submitAbortRef.current?.abort();
+    const controller = new AbortController();
+    submitAbortRef.current = controller;
+
     setIsSubmitting(true);
     setError(null);
     setResponse(null);
@@ -98,15 +115,24 @@ export default function DoVeSoClient({ sources, today }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
+        signal: controller.signal,
         body: JSON.stringify({ code, date, tickets: splitInput(ticketText) })
       });
       const payload = (await res.json()) as CheckResponse;
+
+      if (!isMountedRef.current || controller.signal.aborted) return;
       if (!res.ok || !payload.ok) throw new Error(payload.error || 'Không dò được vé. Vui lòng thử lại.');
       setResponse(payload);
     } catch (err) {
+      if (!isMountedRef.current || controller.signal.aborted) return;
       setError(err instanceof Error ? err.message : 'Không dò được vé. Vui lòng thử lại.');
     } finally {
-      setIsSubmitting(false);
+      if (isMountedRef.current && !controller.signal.aborted) {
+        setIsSubmitting(false);
+      }
+      if (submitAbortRef.current === controller) {
+        submitAbortRef.current = null;
+      }
     }
   }
 

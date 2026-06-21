@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LiveDrawWindow, LotteryLiveResult, PrizeSchemeId } from '@/lib/lottery/types';
 import { getPrizeSpecs, getShortPrizeLabel } from '@/lib/lottery/schemes';
 import { toVietnameseDate } from '@/lib/lottery/format';
@@ -38,30 +38,54 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastCheckedAt, setLastCheckedAt] = useState<string | null>(null);
+  const isMountedRef = useRef(false);
+  const liveAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      liveAbortRef.current?.abort();
+      liveAbortRef.current = null;
+    };
+  }, []);
 
   const prizeSpecs = useMemo(() => getPrizeSpecs(scheme), [scheme]);
   const rowsByLabel = useMemo(() => new Map((result?.prizes || []).map((row) => [row.label, row.numbers])), [result]);
   const shouldPoll = currentWindow.shouldPoll && !result?.isComplete;
 
   const fetchLiveResult = useCallback(async () => {
-    if (!currentWindow.date) return;
+    if (!currentWindow.date || !isMountedRef.current) return;
+
+    liveAbortRef.current?.abort();
+    const controller = new AbortController();
+    liveAbortRef.current = controller;
 
     setIsChecking(true);
     setError(null);
 
     try {
       const params = new URLSearchParams({ code, date: currentWindow.date, t: String(Date.now()) });
-      const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store' });
+      const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store', signal: controller.signal });
       const payload = (await response.json()) as LiveApiPayload;
+
+      if (!isMountedRef.current || controller.signal.aborted) return;
 
       if (payload.liveWindow) setCurrentWindow(payload.liveWindow);
       if (!response.ok) throw new Error(payload.error || 'Không kiểm tra được dữ liệu live');
       if (payload.data) setResult(payload.data);
       setLastCheckedAt(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     } catch (fetchError) {
+      if (!isMountedRef.current || controller.signal.aborted) return;
       setError(fetchError instanceof Error ? fetchError.message : 'Không kiểm tra được dữ liệu live');
     } finally {
-      setIsChecking(false);
+      if (isMountedRef.current && !controller.signal.aborted) {
+        setIsChecking(false);
+      }
+      if (liveAbortRef.current === controller) {
+        liveAbortRef.current = null;
+      }
     }
   }, [code, currentWindow.date]);
 
