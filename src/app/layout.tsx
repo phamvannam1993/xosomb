@@ -96,10 +96,12 @@ const navLinks = [
     href: '/xsmb-30-ngay',
     children: [
       { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
+      { label: 'Dò vé số online', href: '/do-ve-so' },
       { label: 'XSMB hôm nay', href: '/xsmb' },
       { label: 'Thống kê tham khảo', href: '/thong-ke' }
     ]
   },
+  { label: 'Dò vé', href: '/do-ve-so' },
   {
     label: 'Quay thử',
     href: '/quay-thu-xsmb',
@@ -130,6 +132,7 @@ const footerColumns = [
     links: [
       { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
       { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
+      { label: 'Dò vé số online', href: '/do-ve-so' },
       { label: 'Tra cứu XSMB hôm nay', href: '/xsmb' },
       { label: 'Kết quả Vietlott', href: '/vietlott' }
     ]
@@ -138,6 +141,7 @@ const footerColumns = [
     title: 'Hướng dẫn',
     links: [
       { label: 'Cách đọc bảng kết quả', href: '/xsmb' },
+      { label: 'Dò vé số online', href: '/do-ve-so' },
       { label: 'Bảng lô tô 2 số cuối', href: '/thong-ke' },
       { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' }
     ]

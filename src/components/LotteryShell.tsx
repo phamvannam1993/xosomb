@@ -5,6 +5,7 @@ import { getSourcesByRegion } from '@/lib/lottery/catalog';
 const dataUtilities = [
   { label: 'XSMB hôm nay', href: '/xsmb' },
   { label: 'XSMB 30 ngày', href: '/xsmb-30-ngay' },
+  { label: 'Dò vé số online', href: '/do-ve-so' },
   { label: 'Thống kê tham khảo', href: '/thong-ke' },
   { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
   { label: 'Kết quả Vietlott', href: '/vietlott' }
@@ -13,6 +14,7 @@ const dataUtilities = [
 const guideLinks = [
   { label: 'Cách đọc bảng kết quả', href: '/xsmb' },
   { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' },
+  { label: 'Dò vé số online', href: '/do-ve-so' },
   { label: 'Lịch quay các miền', href: '/lich-mo-thuong' }
 ];
 

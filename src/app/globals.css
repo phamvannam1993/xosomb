@@ -2029,3 +2029,241 @@ input[type='date'] {
     border-width: 5px;
   }
 }
+
+/* Do ve so online */
+.toolIntro h1 {
+  margin: 0 0 8px;
+  color: var(--brand);
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+  line-height: 1.25;
+}
+
+.ticketChecker {
+  display: grid;
+  gap: 14px;
+}
+
+.ticketForm,
+.ticketResults {
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid #ecd7bf;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.ticketFormGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 12px;
+}
+
+.ticketForm label,
+.ticketTextareaLabel {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.ticketForm select,
+.ticketForm textarea,
+.ticketForm input[type='date'] {
+  width: 100%;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid #eccfa9;
+  border-radius: 9px;
+}
+
+.ticketForm select,
+.ticketForm input[type='date'] {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.ticketForm textarea {
+  min-height: 132px;
+  margin-top: 12px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.ticketHelpRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ticketSubmit {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 14px;
+  color: #fff;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.ticketSubmit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.ticketAlert {
+  padding: 12px 14px;
+  border: 1px solid #ffd4d4;
+  border-radius: 10px;
+  color: #8f0f14;
+  background: #fff2f2;
+  font-weight: 800;
+}
+
+.ticketResultsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ticketResultsHeader h2 {
+  margin: 0 0 4px;
+  color: var(--brand);
+  font-size: 1.25rem;
+}
+
+.ticketResultsHeader p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.ticketResultsHeader a {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  color: #fff;
+  background: var(--brand);
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.ticketResultList {
+  display: grid;
+  gap: 10px;
+}
+
+.ticketResultCard {
+  padding: 12px;
+  border: 1px solid #eee0cf;
+  border-radius: 10px;
+  background: #fffaf2;
+}
+
+.ticketResultCard.matched {
+  border-color: #f3b65d;
+  background: linear-gradient(135deg, #fff8e8, #fff);
+}
+
+.ticketResultCard.notMatched {
+  background: #fff;
+}
+
+.ticketResultTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ticketResultTop strong {
+  color: #111827;
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+}
+
+.ticketResultTop span {
+  padding: 3px 8px;
+  color: var(--muted);
+  background: #f7ead7;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.ticketResultCard.matched .ticketResultTop span {
+  color: #fff;
+  background: var(--green);
+}
+
+.ticketMessage {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.ticketMatchList {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ticketMatchList li {
+  display: grid;
+  grid-template-columns: 64px minmax(80px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid #f1dfca;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.matchPrize {
+  color: var(--brand);
+  font-weight: 900;
+}
+
+.matchNumber {
+  color: #111827;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.matchType {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .ticketFormGrid,
+  .ticketMatchList li {
+    grid-template-columns: 1fr;
+  }
+
+  .ticketResultsHeader,
+  .ticketResultTop,
+  .ticketHelpRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ticketResultsHeader a,
+  .matchType {
+    text-align: center;
+  }
+}
