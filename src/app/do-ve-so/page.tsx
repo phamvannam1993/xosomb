@@ -61,7 +61,7 @@ export default function DoVeSoPage() {
             Công cụ hỗ trợ dò một vé hoặc nhiều vé cùng lúc, không tạo URL riêng theo số vé.
           </p>
           <p>
-            Sau khi dò xong, anh có thể mở ngay bảng kết quả gốc để kiểm tra lại các giải. Dữ liệu chỉ phục vụ tra cứu
+            Sau khi dò xong, anh có thể mở ngay bảng kết quả gốc để kiểm tra lại các giải hoặc dùng thêm <Link href="/in-ve-do">In vé dò</Link> để in phiếu đối chiếu. Dữ liệu chỉ phục vụ tra cứu
             tham khảo, <Link href="/lich-mo-thuong">xem lịch mở thưởng</Link> nếu cần chọn đúng ngày quay.
           </p>
         </section>

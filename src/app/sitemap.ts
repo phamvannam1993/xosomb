@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry('/', today, 1.0, 'hourly'),
     entry('/xsmb-30-ngay', today, 0.7, 'daily'),
     entry('/do-ve-so', today, 0.75, 'weekly'),
+    entry('/in-ve-do', today, 0.72, 'weekly'),
     entry('/thong-ke', today, 0.7, 'daily'),
     entry('/lich-mo-thuong', today, 0.6, 'weekly'),
     entry('/vietlott', today, 0.8, 'daily')

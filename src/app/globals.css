@@ -2267,3 +2267,563 @@ input[type='date'] {
     text-align: center;
   }
 }
+
+/* In ve do / print lottery sheet */
+.printTool {
+  display: grid;
+  gap: 14px;
+}
+
+.printFormCard,
+.printPreviewCards article,
+.printNoteBox {
+  padding: 16px;
+  border: 1px solid #ecd7bf;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.printStepHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.printStepHeader > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #fff;
+  background: var(--brand);
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.printStepHeader h2 {
+  margin: 0 0 4px;
+  color: var(--brand);
+  font-size: 1.3rem;
+}
+
+.printStepHeader p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.printFormGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 12px;
+}
+
+.printFormGrid label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.printFormGrid select,
+.printFormGrid input[type='date'] {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid #eccfa9;
+  border-radius: 9px;
+}
+
+.printSizeGroup {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.printSizeGroup legend {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.printSizeGroup label {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #ecd7bf;
+  border-radius: 10px;
+  background: #fffaf2;
+  cursor: pointer;
+}
+
+.printSizeGroup label.selected {
+  border-color: var(--brand-2);
+  background: #fff3dc;
+}
+
+.printSizeGroup input {
+  margin: 0;
+}
+
+.printSizeGroup strong {
+  color: var(--brand-dark);
+}
+
+.printSizeGroup span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.printActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.printPrimaryButton,
+.printSecondaryButton,
+.printNowButton,
+.printActionButtons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+.printPrimaryButton,
+.printNowButton {
+  color: #fff;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  border: 0;
+  cursor: pointer;
+}
+
+.printSecondaryButton,
+.printActionButtons a {
+  color: var(--brand-dark);
+  background: #fff3dc;
+  border: 1px solid #ffd59b;
+}
+
+.printPreviewCards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.printPreviewCards article {
+  min-height: 118px;
+}
+
+.printPreviewCards strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--blue);
+  font-size: 1.05rem;
+}
+
+.printPreviewCards span,
+.printNoteBox {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.printNoteBox strong {
+  color: var(--brand-dark);
+}
+
+.printPage {
+  padding: 18px 0 32px;
+  background: #eef2f7;
+}
+
+.printActionBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(1120px, calc(100% - 24px));
+  margin: 0 auto 16px;
+  padding: 12px 14px;
+  border: 1px solid #d6dee8;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 30px rgba(24, 35, 59, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.printActionBar strong,
+.printActionBar span {
+  display: block;
+}
+
+.printActionBar span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.printActionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.printCanvas {
+  width: min(1120px, calc(100% - 24px));
+  margin: 0 auto;
+  overflow: auto;
+  padding: 12px;
+  border-radius: 16px;
+  background: #dfe7f1;
+}
+
+.printSheet {
+  margin: 0 auto;
+  color: #111827;
+  background: #fff;
+  border: 1px solid #cfd6df;
+  box-shadow: 0 16px 42px rgba(17, 24, 39, 0.12);
+}
+
+.printSheet.a4 {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm;
+}
+
+.printSheet.a5 {
+  width: 148mm;
+  min-height: 210mm;
+  padding: 9mm;
+  font-size: 12px;
+}
+
+.printSheet.k80 {
+  width: 80mm;
+  min-height: 180mm;
+  padding: 5mm;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.38;
+}
+
+.printSheetHeader {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.printBrand,
+.k80Brand {
+  color: #1454a8;
+  font-size: 24px;
+  font-weight: 1000;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.printBrand span,
+.k80Brand span {
+  color: var(--brand);
+}
+
+.printTitleBlock {
+  text-align: center;
+}
+
+.printTitleBlock h1,
+.printSheet.k80 h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.printTitleBlock p {
+  margin: 0;
+  color: var(--brand);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.printTitleBlock strong {
+  display: block;
+  margin-top: 3px;
+}
+
+.printQrBox {
+  display: grid;
+  min-height: 80px;
+  place-items: center;
+  padding: 8px;
+  border: 2px solid #111827;
+  text-align: center;
+}
+
+.printQrBox span {
+  font-weight: 1000;
+  letter-spacing: 0.12em;
+}
+
+.printQrBox small {
+  max-width: 90px;
+  overflow-wrap: anywhere;
+  font-size: 9px;
+  line-height: 1.25;
+}
+
+.printPrizeTable,
+.printLotoTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.printPrizeTable th,
+.printPrizeTable td,
+.printLotoTable th,
+.printLotoTable td {
+  padding: 7px 8px;
+  border: 1px solid #aeb6c2;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.printPrizeTable th {
+  width: 24mm;
+  font-weight: 900;
+}
+
+.printNumberGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  gap: 6px;
+  align-items: center;
+}
+
+.printNumber {
+  display: inline-block;
+  font-size: 20px;
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+}
+
+.printNumber.special {
+  color: var(--brand);
+  font-size: 30px;
+}
+
+.printLotoSection h2 {
+  margin: 14px 0 8px;
+  color: var(--brand);
+  font-size: 16px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.printLotoTable th {
+  width: 18mm;
+}
+
+.printSheetFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.printSheetFooter p {
+  margin: 0;
+}
+
+.printSheet.a5 .printSheetHeader {
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+
+.printSheet.a5 .printBrand {
+  font-size: 18px;
+  text-align: center;
+}
+
+.printSheet.a5 .printTitleBlock h1 {
+  font-size: 15px;
+}
+
+.printSheet.a5 .printTitleBlock p {
+  font-size: 14px;
+}
+
+.printSheet.a5 .printPrizeTable th,
+.printSheet.a5 .printPrizeTable td,
+.printSheet.a5 .printLotoTable th,
+.printSheet.a5 .printLotoTable td {
+  padding: 4px 5px;
+}
+
+.printSheet.a5 .printNumber {
+  font-size: 14px;
+}
+
+.printSheet.a5 .printNumber.special {
+  font-size: 19px;
+}
+
+.printSheet.a5 .printLotoSection h2 {
+  font-size: 13px;
+}
+
+.printSheet.a5 .printSheetFooter {
+  display: block;
+  font-size: 10px;
+}
+
+.k80Brand {
+  margin-bottom: 4px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.printSheet.k80 h1,
+.printSheet.k80 h2,
+.k80Meta {
+  text-align: center;
+}
+
+.printSheet.k80 h1 {
+  font-size: 14px;
+}
+
+.printSheet.k80 h2 {
+  margin: 8px 0 4px;
+  font-size: 13px;
+}
+
+.k80Meta {
+  margin: 0 0 6px;
+  font-weight: 900;
+}
+
+.k80Divider {
+  margin: 8px 0;
+  border-top: 1px dashed #111827;
+}
+
+.k80PrizeList p,
+.k80LotoGrid p,
+.k80Disclaimer {
+  margin: 3px 0;
+}
+
+.k80PrizeList strong {
+  display: inline-block;
+  min-width: 34px;
+}
+
+.k80LotoGrid {
+  columns: 2;
+  column-gap: 10px;
+}
+
+.k80Disclaimer {
+  text-align: center;
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .printFormGrid,
+  .printSizeGroup,
+  .printPreviewCards {
+    grid-template-columns: 1fr;
+  }
+
+  .printActionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .printActionButtons {
+    justify-content: stretch;
+  }
+
+  .printActionButtons > * {
+    flex: 1 1 150px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .siteHeader,
+  .siteFooter,
+  .backToTop,
+  .no-print {
+    display: none !important;
+  }
+
+  .printPage,
+  .printCanvas {
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  .printSheet {
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .printSheet.k80 {
+    width: 80mm !important;
+    padding: 0 !important;
+  }
+
+  .printPrizeTable,
+  .printLotoTable,
+  .printSheetHeader,
+  .printLotoSection,
+  .printSheetFooter {
+    break-inside: avoid;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
