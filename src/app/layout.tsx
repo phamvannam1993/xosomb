@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import './globals.css';
 import { absoluteUrl, siteConfig } from '@/lib/site';
 
@@ -225,8 +224,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             <div className="footerBottom">
               <div className="footerAbout">
-                <p><strong>{siteConfig.domain}</strong> - Trang tra cứu kết quả xổ số miền Bắc và kết quả xổ số theo tỉnh.</p>
-                <p>Dữ liệu được trình bày để tham khảo, cập nhật thường xuyên và hỗ trợ người dùng xem lại kết quả theo ngày.</p>
+                <p><strong>{siteConfig.domain}</strong> - Tra cứu kết quả xổ số ba miền cập nhật hàng ngày.</p>
+                <p>Dữ liệu tham khảo, không phải gợi ý dự đoán hay khuyến cáo đầu tư.</p>
                 <p>Website không bán vé, không mua hộ vé và không nhận đặt cược dưới mọi hình thức.</p>
               </div>
 
@@ -242,23 +241,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <a href="#top" className="backToTop" aria-label="Lên đầu trang">⌃</a>
         </footer>
-
-        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}');
-              `}
-            </Script>
-          </>
-        )}
       </body>
     </html>
   );

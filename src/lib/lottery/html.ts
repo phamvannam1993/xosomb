@@ -1,5 +1,5 @@
 import type { LotteryResult, LotterySourceConfig } from './types';
-import { isCompleteLotteryResult, normalizeResultFromText } from './normalize';
+import { isCompleteLotteryResult, normalizePartialResultFromText, normalizeResultFromText } from './normalize';
 import { ddMmYyyyFromDate, normalizeDateFromText, yyyyMmDdToXsktPathDate } from './format';
 import { discoverPageUrl } from './discovery';
 
@@ -96,7 +96,7 @@ function extractLikelyResultSlice(text: string, source: LotterySourceConfig, dat
   return slice.slice(0, end);
 }
 
-export async function fetchLotteryFromHtml(source: LotterySourceConfig, date?: string): Promise<LotteryResult | null> {
+async function fetchLotteryHtmlText(source: LotterySourceConfig, date?: string, noStore = false) {
   const pageUrl = await discoverPageUrl(source);
   if (!pageUrl) return null;
 
@@ -106,7 +106,9 @@ export async function fetchLotteryFromHtml(source: LotterySourceConfig, date?: s
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'xosomb.vn data fetcher/1.0'
     },
-    next: { revalidate: Number(process.env.LOTTERY_REVALIDATE_SECONDS || process.env.XSMB_REVALIDATE_SECONDS || 60) }
+    ...(noStore
+      ? { cache: 'no-store' as const }
+      : { next: { revalidate: Number(process.env.LOTTERY_REVALIDATE_SECONDS || process.env.XSMB_REVALIDATE_SECONDS || 60) } })
   });
 
   if (response.status === 404) return null;
@@ -116,10 +118,29 @@ export async function fetchLotteryFromHtml(source: LotterySourceConfig, date?: s
   const slice = extractLikelyResultSlice(text, source, date);
   const resultDate = date || normalizeDateFromText(slice) || normalizeDateFromText(text) || undefined;
 
-  return normalizeResultFromText(slice, source, {
-    date: resultDate,
-    sourceUrl: url,
+  return { slice, resultDate, url };
+}
+
+export async function fetchLotteryFromHtml(source: LotterySourceConfig, date?: string): Promise<LotteryResult | null> {
+  const payload = await fetchLotteryHtmlText(source, date);
+  if (!payload) return null;
+
+  return normalizeResultFromText(payload.slice, source, {
+    date: payload.resultDate,
+    sourceUrl: payload.url,
     sourceName: process.env.LOTTERY_HTML_SOURCE_NAME || 'XSKT HTML',
+    dataSource: 'html'
+  });
+}
+
+export async function fetchPartialLotteryFromHtml(source: LotterySourceConfig, date?: string): Promise<LotteryResult | null> {
+  const payload = await fetchLotteryHtmlText(source, date, true);
+  if (!payload) return null;
+
+  return normalizePartialResultFromText(payload.slice, source, {
+    date: payload.resultDate,
+    sourceUrl: payload.url,
+    sourceName: process.env.LOTTERY_HTML_SOURCE_NAME || 'XSKT HTML realtime',
     dataSource: 'html'
   });
 }
