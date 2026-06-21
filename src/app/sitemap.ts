@@ -1,131 +1,75 @@
 import type { MetadataRoute } from 'next';
-import { siteConfig } from '@/lib/site';
+import { getAllLotterySources } from '@/lib/lottery/catalog';
+import { readRecentCachedResults } from '@/lib/lottery/cache';
 import { todayInVietnam } from '@/lib/lottery/format';
+import { getAllVietlottProducts } from '@/lib/vietlott/catalog';
+import { readRecentCachedVietlottResults } from '@/lib/vietlott/cache';
+import { siteConfig } from '@/lib/site';
+
+function entry(path: string, lastModified: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']): MetadataRoute.Sitemap[number] {
+  const baseUrl = siteConfig.url.replace(/\/$/, '');
+  return {
+    url: path === '/' ? baseUrl : `${baseUrl}${path}`,
+    lastModified,
+    changeFrequency,
+    priority
+  };
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = siteConfig.url;
   const today = todayInVietnam();
+  const lotterySources = getAllLotterySources();
+  const vietlottProducts = getAllVietlottProducts();
 
-  // Tính ngày 30 ngày trước
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0];
+  const staticEntries: MetadataRoute.Sitemap = [
+    entry('/', today, 1.0, 'hourly'),
+    entry('/xsmb-30-ngay', today, 0.7, 'daily'),
+    entry('/thong-ke', today, 0.7, 'daily'),
+    entry('/lich-mo-thuong', today, 0.6, 'weekly'),
+    entry('/vietlott', today, 0.8, 'daily')
+  ];
 
-  const dateRange: string[] = [];
-  const currentDate = new Date(thirtyDaysAgo);
-  const endDate = new Date(today);
+  const lotteryMainEntries = lotterySources.map((source) =>
+    entry(
+      `/${source.code}`,
+      today,
+      source.code === 'xsmb' ? 0.9 : source.code === 'xsmn' || source.code === 'xsmt' ? 0.85 : 0.75,
+      'hourly'
+    )
+  );
 
-  while (currentDate <= endDate) {
-    dateRange.push(currentDate.toISOString().split('T')[0]);
-    currentDate.setDate(currentDate.getDate() + 1);
+  const lotteryDateEntries = (
+    await Promise.all(
+      lotterySources.map(async (source) => {
+        const results = await readRecentCachedResults(source.code, 30);
+        return results.map((result) => entry(`/${source.code}/${result.date}`, result.updatedAt || result.date, 0.65, 'daily'));
+      })
+    )
+  ).flat();
+
+  const vietlottMainEntries = vietlottProducts.map((product) =>
+    entry(`/vietlott/${product.id}`, today, 0.75, 'daily')
+  );
+
+  const vietlottDateEntries = (
+    await Promise.all(
+      vietlottProducts.map(async (product) => {
+        const results = await readRecentCachedVietlottResults(product.id, 30);
+        return results.map((result) => entry(`/vietlott/${product.id}/${result.date}`, result.updatedAt || result.date, 0.6, 'daily'));
+      })
+    )
+  ).flat();
+
+  const unique = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const item of [
+    ...staticEntries,
+    ...lotteryMainEntries,
+    ...lotteryDateEntries,
+    ...vietlottMainEntries,
+    ...vietlottDateEntries
+  ]) {
+    unique.set(item.url, item);
   }
 
-  // Tất cả lottery types
-  const lotteryTypes = [
-    { code: 'xsmb', name: 'XSMB' },
-    { code: 'xsmn', name: 'XSMN' },
-    { code: 'xsmt', name: 'XSMT' }
-  ];
-
-  // Vietlott products
-  const vietlottProducts = [
-    'mega-645',
-    'power-655',
-    'max-3d',
-    'max-3d-pro'
-  ];
-
-  const entries: MetadataRoute.Sitemap = [
-    // Trang chủ
-    {
-      url: baseUrl,
-      lastModified: today,
-      changeFrequency: 'hourly',
-      priority: 1.0
-    },
-
-    // Trang chính lottery
-    ...lotteryTypes.map(lottery => ({
-      url: `${baseUrl}/${lottery.code}`,
-      lastModified: today,
-      changeFrequency: 'hourly' as const,
-      priority: 0.9
-    })),
-
-    // Trang ngày của lottery (30 ngày gần đây)
-    ...lotteryTypes.flatMap(lottery =>
-      dateRange.map(date => ({
-        url: `${baseUrl}/${lottery.code}/${date}`,
-        lastModified: date,
-        changeFrequency: 'daily' as const,
-        priority: 0.8
-      }))
-    ),
-
-    // Trang chính Vietlott
-    {
-      url: `${baseUrl}/vietlott`,
-      lastModified: today,
-      changeFrequency: 'daily' as const,
-      priority: 0.8
-    },
-
-    // Trang sản phẩm Vietlott
-    ...vietlottProducts.map(product => ({
-      url: `${baseUrl}/vietlott/${product}`,
-      lastModified: today,
-      changeFrequency: 'hourly' as const,
-      priority: 0.8
-    })),
-
-    // Trang ngày của Vietlott (30 ngày gần đây)
-    ...vietlottProducts.flatMap(product =>
-      dateRange.map(date => ({
-        url: `${baseUrl}/vietlott/${product}/${date}`,
-        lastModified: date,
-        changeFrequency: 'daily' as const,
-        priority: 0.7
-      }))
-    ),
-
-    // Trang tiện ích
-    {
-      url: `${baseUrl}/xsmb-30-ngay`,
-      lastModified: today,
-      changeFrequency: 'daily' as const,
-      priority: 0.7
-    },
-    {
-      url: `${baseUrl}/thong-ke`,
-      lastModified: today,
-      changeFrequency: 'daily' as const,
-      priority: 0.7
-    },
-    {
-      url: `${baseUrl}/lich-mo-thuong`,
-      lastModified: today,
-      changeFrequency: 'weekly' as const,
-      priority: 0.6
-    },
-    {
-      url: `${baseUrl}/quay-thu-xsmb`,
-      lastModified: today,
-      changeFrequency: 'weekly' as const,
-      priority: 0.5
-    },
-    {
-      url: `${baseUrl}/quay-thu-xsmn`,
-      lastModified: today,
-      changeFrequency: 'weekly' as const,
-      priority: 0.5
-    },
-    {
-      url: `${baseUrl}/quay-thu-xsmt`,
-      lastModified: today,
-      changeFrequency: 'weekly' as const,
-      priority: 0.5
-    }
-  ];
-
-  return entries;
+  return Array.from(unique.values());
 }

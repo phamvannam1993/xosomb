@@ -8,6 +8,8 @@ import { RecentResults } from '@/components/RecentResults';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
 import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
+import { getLotterySource } from '@/lib/lottery/catalog';
+import { createLivePlaceholderResult, getLiveDrawWindow, toLiveLotteryResult } from '@/lib/lottery/live';
 import { getLatestLotteryResult, getRecentLotteryResults } from '@/lib/lottery/provider';
 
 function BreadcrumbListSchema({ schema }: { schema: string }) {
@@ -25,6 +27,18 @@ export const metadata: Metadata = {
 export default async function XsmbTodayPage() {
   const result = await getLatestLotteryResult('xsmb');
   const recent = await getRecentLotteryResults('xsmb');
+  const xsmbSource = getLotterySource('xsmb')!;
+  const liveWindow = getLiveDrawWindow(xsmbSource);
+  const liveOptions = liveWindow.shouldPoll
+    ? {
+        code: xsmbSource.code,
+        shortName: xsmbSource.shortName,
+        scheme: xsmbSource.scheme,
+        liveWindow,
+        initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
+      }
+    : null;
+  const boardResult = result || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' },
@@ -38,9 +52,9 @@ export default async function XsmbTodayPage() {
         <MarketTabs />
       <section className="searchPanel">
         <div className="date-picker-title">Chọn ngày xem XSMB</div>
-        <DateSearchForm defaultDate={result?.date} code="xsmb" />
+        <DateSearchForm defaultDate={liveOptions?.liveWindow.date || boardResult?.date} code="xsmb" />
       </section>
-      {result ? <ResultBoard result={result} /> : <DataUnavailable />}
+      {boardResult ? <ResultBoard result={boardResult} live={liveOptions} /> : <DataUnavailable />}
       {recent.length ? <RecentResults results={recent} /> : null}
       <DisclaimerBox />
       </LotteryShell>

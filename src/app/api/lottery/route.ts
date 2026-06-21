@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLotterySource } from '@/lib/lottery/catalog';
 import { getLatestLotteryResult, getLotteryResult, getLotteryRuntimeConfig, getRecentLotteryResults } from '@/lib/lottery/provider';
-import { isYyyyMmDd } from '@/lib/lottery/format';
+import { isFutureDate, isYyyyMmDd } from '@/lib/lottery/format';
 
 export const revalidate = 60;
 
@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (date && !isYyyyMmDd(date)) {
-    return json({ error: 'date phải có định dạng YYYY-MM-DD' }, { status: 400 });
+    return json({ error: 'date phải là ngày hợp lệ, định dạng YYYY-MM-DD' }, { status: 400 });
+  }
+
+  if (date && isFutureDate(date)) {
+    return json({ error: 'Không hỗ trợ truy vấn ngày tương lai', code: source.code, date }, { status: 404 });
   }
 
   if (recent) {

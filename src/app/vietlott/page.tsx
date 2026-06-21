@@ -52,7 +52,7 @@ export default async function VietlottPage() {
       {results.filter(Boolean).length ? (
         results.map((result) => result ? <VietlottBoard result={result} headingLevel={2} key={result.product} /> : null)
       ) : (
-        <DataUnavailable title="Chưa có dữ liệu Vietlott" message="Kết quả Vietlott chưa sẵn sàng. Vui lòng thử lại sau." />
+        <DataUnavailable title="Chưa có dữ liệu Vietlott" message="Kết quả Vietlott chưa sẵn sàng. Vui lòng thử lại sau." headingLevel={2} />
       )}
       </LotteryShell>
     </>

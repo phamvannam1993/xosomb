@@ -8,6 +8,7 @@ import { MarketTabs } from '@/components/MarketTabs';
 import { RecentResults } from '@/components/RecentResults';
 import { ResultBoard } from '@/components/ResultBoard';
 import { getLotterySource } from '@/lib/lottery/catalog';
+import { createLivePlaceholderResult, getLiveDrawWindow, toLiveLotteryResult } from '@/lib/lottery/live';
 import { getLatestLotteryResult, getRecentLotteryResults } from '@/lib/lottery/provider';
 import { absoluteUrl } from '@/lib/site';
 
@@ -34,17 +35,28 @@ export default async function LotteryCodePage({ params }: PageProps) {
 
   const result = await getLatestLotteryResult(source.code);
   const recent = await getRecentLotteryResults(source.code);
+  const liveWindow = getLiveDrawWindow(source);
+  const liveOptions = liveWindow.shouldPoll
+    ? {
+        code: source.code,
+        shortName: source.shortName,
+        scheme: source.scheme,
+        liveWindow,
+        initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
+      }
+    : null;
+  const boardResult = result || (liveOptions ? createLivePlaceholderResult(source, liveWindow.date) : null);
 
   return (
     <LotteryShell>
       <MarketTabs />
       <section className="searchPanel">
         <div className="date-picker-title">Chọn ngày xem {source.shortName}</div>
-        <DateSearchForm defaultDate={result?.date} code={source.code} />
+        <DateSearchForm defaultDate={liveOptions?.liveWindow.date || boardResult?.date} code={source.code} />
       </section>
-      {result ? (
+      {boardResult ? (
         <>
-          <ResultBoard result={result} />
+          <ResultBoard result={boardResult} live={liveOptions} />
           {recent.length ? <RecentResults results={recent} /> : null}
         </>
       ) : (

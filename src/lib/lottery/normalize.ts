@@ -1,6 +1,6 @@
-import type { LotteryResult, LotterySourceConfig, PrizeRow, PrizeSchemeId } from './types';
+import type { LotteryLiveResult, LotteryResult, LotterySourceConfig, PrizeRow, PrizeSchemeId } from './types';
 import { getPrizeSpecs, getSpecialSpec } from './schemes';
-import { normalizeDateFromPubDate, normalizeDateFromText } from './format';
+import { isFutureDate, isYyyyMmDd, normalizeDateFromPubDate, normalizeDateFromText } from './format';
 import { stripHtml } from './text';
 
 const LABEL_ALIASES: Record<string, string> = {
@@ -334,9 +334,52 @@ export function normalizeResultFromText(
   return hasUsableLotteryResult(result) ? result : null;
 }
 
+
+export function normalizeLiveResultFromText(
+  rawText: string,
+  source: LotterySourceConfig,
+  options: { date?: string; sourceUrl?: string; sourceName?: string; updatedAt?: string; dataSource?: 'rss' | 'html' } = {}
+): LotteryLiveResult | null {
+  const cleanText = stripHtml(rawText);
+  const date = options.date || normalizeDateFromText(cleanText) || normalizeDateFromPubDate(options.updatedAt);
+  if (!date || !isYyyyMmDd(date) || isFutureDate(date)) return null;
+
+  const prizes = parsePrizeRowsFromText(cleanText, source.scheme);
+  if (!prizes.length) return null;
+
+  const specialLabel = getSpecialSpec(source.scheme).label;
+  const specialPrize = prizes.find((row) => row.label === specialLabel)?.numbers[0];
+  const completenessScore = lotteryRowsCompletenessScore(prizes, source.scheme);
+  const expectedScore = expectedCompletenessScore(source.scheme);
+  const isComplete = Boolean(specialPrize) && arePrizeRowsComplete(prizes, source.scheme);
+
+  return {
+    date,
+    code: source.code,
+    region: source.region,
+    province: source.name.replace(/^Xổ số\s+/i, ''),
+    shortName: source.shortName,
+    scheme: source.scheme,
+    specialPrize,
+    prizes,
+    sourceName: options.sourceName || 'XSKT RSS',
+    sourceUrl: options.sourceUrl,
+    updatedAt:
+      options.updatedAt && !Number.isNaN(new Date(options.updatedAt).getTime())
+        ? new Date(options.updatedAt).toISOString()
+        : new Date().toISOString(),
+    fetchedAt: new Date().toISOString(),
+    dataSource: options.dataSource || 'rss',
+    isComplete,
+    status: isComplete ? 'complete' : 'running',
+    completenessScore,
+    expectedScore
+  };
+}
+
 export function hasUsableLotteryResult(value: LotteryResult | null): value is LotteryResult {
   if (!value) return false;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.date)) return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.date) || isFutureDate(value.date)) return false;
 
   const specialSpec = getSpecialSpec(value.scheme);
   if (!value.specialPrize || !new RegExp(`^\\d{${specialSpec.length}}$`).test(value.specialPrize)) return false;
@@ -376,6 +419,100 @@ export function isCompleteLotteryResult(value: LotteryResult | null): value is L
     const row = value.prizes.find((item) => item.label === spec.label);
     return Boolean(row && row.numbers.length === spec.count);
   });
+}
+
+
+export function lotteryRowsCompletenessScore(rows: PrizeRow[], scheme: PrizeSchemeId) {
+  const specs = getPrizeSpecs(scheme);
+  return specs.reduce((score, spec) => {
+    const row = rows.find((item) => item.label === spec.label);
+    return score + Math.min(row?.numbers.length || 0, spec.count);
+  }, 0);
+}
+
+function arePrizeRowsComplete(rows: PrizeRow[], scheme: PrizeSchemeId) {
+  return getPrizeSpecs(scheme).every((spec) => {
+    const row = rows.find((item) => item.label === spec.label);
+    return Boolean(row && row.numbers.length === spec.count);
+  });
+}
+
+function getPayloadObject(value: unknown): Record<string, unknown> | null {
+  const payload = extractDataObject(value);
+  return typeof payload === 'object' && payload !== null ? (payload as Record<string, unknown>) : null;
+}
+
+function normalizeLiveDate(value: unknown) {
+  return typeof value === 'string' && isYyyyMmDd(value) && !isFutureDate(value) ? value : null;
+}
+
+export function normalizeLiveApiResult(
+  value: unknown,
+  source: LotterySourceConfig,
+  options: { date?: string; sourceName?: string } = {}
+): LotteryLiveResult | null {
+  const payload = getPayloadObject(value);
+  if (!payload) return null;
+
+  const rawRows = Array.isArray(payload.prizes)
+    ? payload.prizes
+    : Array.isArray(payload.results)
+      ? payload.results
+      : [];
+  const prizes = normalizePrizeRows(rawRows as PrizeRow[], source.scheme);
+  const date = normalizeLiveDate(payload.date) || normalizeLiveDate(options.date);
+  if (!date || !prizes.length) return null;
+
+  const specialPrize =
+    typeof payload.specialPrize === 'string'
+      ? payload.specialPrize
+      : prizes.find((row) => row.label === getSpecialSpec(source.scheme).label)?.numbers[0];
+
+  const completenessScore = lotteryRowsCompletenessScore(prizes, source.scheme);
+  const expectedScore = expectedCompletenessScore(source.scheme);
+  const isComplete = arePrizeRowsComplete(prizes, source.scheme);
+
+  return {
+    date,
+    code: source.code,
+    region: source.region,
+    province: source.name.replace(/^Xổ số\s+/i, ''),
+    shortName: source.shortName,
+    scheme: source.scheme,
+    specialPrize,
+    prizes,
+    sourceName: typeof payload.sourceName === 'string' ? payload.sourceName : options.sourceName || 'API tường thuật xổ số',
+    sourceUrl: typeof payload.sourceUrl === 'string' ? payload.sourceUrl : undefined,
+    updatedAt: typeof payload.updatedAt === 'string' ? payload.updatedAt : new Date().toISOString(),
+    fetchedAt: new Date().toISOString(),
+    dataSource: 'live-api',
+    isComplete,
+    status: isComplete ? 'complete' : 'running',
+    completenessScore,
+    expectedScore
+  };
+}
+
+export function liveResultToCompleteLotteryResult(value: LotteryLiveResult | null): LotteryResult | null {
+  if (!value || !value.isComplete || !value.specialPrize) return null;
+
+  const result: LotteryResult = {
+    date: value.date,
+    code: value.code,
+    region: value.region,
+    province: value.province,
+    shortName: value.shortName,
+    scheme: value.scheme,
+    specialPrize: value.specialPrize,
+    prizes: value.prizes,
+    sourceName: value.sourceName,
+    sourceUrl: value.sourceUrl,
+    updatedAt: value.updatedAt,
+    fetchedAt: value.fetchedAt,
+    dataSource: value.dataSource === 'live-api' ? 'api' : value.dataSource
+  };
+
+  return isCompleteLotteryResult(result) ? result : null;
 }
 
 export function pickBetterLotteryResult(

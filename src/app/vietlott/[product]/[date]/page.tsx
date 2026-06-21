@@ -5,7 +5,7 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { VietlottBoard } from '@/components/vietlott/VietlottBoard';
 import { VietlottTabs } from '@/components/vietlott/VietlottTabs';
 import { getVietlottProduct } from '@/lib/vietlott/catalog';
-import { isYyyyMmDd } from '@/lib/vietlott/format';
+import { isFutureDate, isYyyyMmDd } from '@/lib/vietlott/format';
 import { getVietlottResult } from '@/lib/vietlott/provider';
 import { absoluteUrl } from '@/lib/site';
 
@@ -16,7 +16,7 @@ export const revalidate = 60;
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { product: productParam, date } = await params;
   const product = getVietlottProduct(productParam);
-  if (!product || !isYyyyMmDd(date)) return { title: 'Không tìm thấy kết quả Vietlott', robots: { index: false, follow: true } };
+  if (!product || !isYyyyMmDd(date) || isFutureDate(date)) return { title: 'Không tìm thấy kết quả Vietlott', robots: { index: false, follow: false } };
 
   const result = await getVietlottResult(product.id, date);
 
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function VietlottDatePage({ params }: PageProps) {
   const { product: productParam, date } = await params;
   const product = getVietlottProduct(productParam);
-  if (!product || !isYyyyMmDd(date)) notFound();
+  if (!product || !isYyyyMmDd(date) || isFutureDate(date)) notFound();
 
   const result = await getVietlottResult(product.id, date);
 

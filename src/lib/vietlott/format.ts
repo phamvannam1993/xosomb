@@ -13,8 +13,25 @@ export function cleanHtmlText(html: string) {
     .trim();
 }
 
+export function parseYyyyMmDd(value?: string | null): Date | null {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
 export function isYyyyMmDd(value?: string | null) {
-  return Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value));
+  return Boolean(parseYyyyMmDd(value));
 }
 
 export function todayInVietnam() {
@@ -24,6 +41,10 @@ export function todayInVietnam() {
     month: '2-digit',
     day: '2-digit'
   }).format(new Date());
+}
+
+export function isFutureDate(value: string) {
+  return isYyyyMmDd(value) && value > todayInVietnam();
 }
 
 export function normalizeDateFromText(text: string): string | null {
@@ -36,12 +57,14 @@ export function normalizeDateFromText(text: string): string | null {
   if (year < 100) year += 2000;
   if (day < 1 || day > 31 || month < 1 || month > 12) return null;
 
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const normalized = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return isYyyyMmDd(normalized) ? normalized : null;
 }
 
 export function toVietnameseDate(date: string) {
-  const [year, month, day] = date.split('-').map(Number);
-  const d = new Date(Date.UTC(year, month - 1, day));
+  const d = parseYyyyMmDd(date);
+  if (!d) return date;
+
   return new Intl.DateTimeFormat('vi-VN', {
     timeZone: 'Asia/Ho_Chi_Minh',
     weekday: 'long',

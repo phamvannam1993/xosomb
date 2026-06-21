@@ -4,12 +4,15 @@ import { todayInVietnam } from '@/lib/lottery/format';
 type DataUnavailableProps = {
   title?: string;
   message?: string;
+  headingLevel?: 1 | 2;
 };
 
-export function DataUnavailable({ title = 'Chưa có dữ liệu xổ số', message }: DataUnavailableProps) {
+export function DataUnavailable({ title = 'Chưa có dữ liệu xổ số', message, headingLevel = 1 }: DataUnavailableProps) {
+  const HeadingTag = headingLevel === 2 ? 'h2' : 'h1';
+
   return (
     <section className="contentPanel seoText">
-      <h1>{title}</h1>
+      <HeadingTag>{title}</HeadingTag>
       <p>
         {message ||
           'Kết quả cho ngày này chưa sẵn sàng. Vui lòng chọn ngày khác hoặc quay lại sau khi dữ liệu được cập nhật.'}

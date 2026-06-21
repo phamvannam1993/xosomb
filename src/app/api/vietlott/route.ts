@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getVietlottProduct } from '@/lib/vietlott/catalog';
 import { getLatestVietlottResult, getRecentVietlottResults, getVietlottResult, getVietlottRuntimeConfig } from '@/lib/vietlott/provider';
-import { isYyyyMmDd } from '@/lib/vietlott/format';
+import { isFutureDate, isYyyyMmDd } from '@/lib/vietlott/format';
 
 export const revalidate = 60;
 
@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (date && !isYyyyMmDd(date)) {
-    return json({ error: 'date phải có định dạng YYYY-MM-DD' }, { status: 400 });
+    return json({ error: 'date phải là ngày hợp lệ, định dạng YYYY-MM-DD' }, { status: 400 });
+  }
+
+  if (date && isFutureDate(date)) {
+    return json({ error: 'Không hỗ trợ truy vấn ngày tương lai', product: product.id, date }, { status: 404 });
   }
 
   if (recent) {

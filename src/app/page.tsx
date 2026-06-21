@@ -9,6 +9,8 @@ import { RecentResults } from '@/components/RecentResults';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
 import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
+import { getLotterySource } from '@/lib/lottery/catalog';
+import { createLivePlaceholderResult, getLiveDrawWindow, toLiveLotteryResult } from '@/lib/lottery/live';
 import { getLatestLotteryResult, getRecentLotteryResults } from '@/lib/lottery/provider';
 
 function BreadcrumbListSchema({ schema }: { schema: string }) {
@@ -26,6 +28,18 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const latest = await getLatestLotteryResult('xsmb');
   const recent = await getRecentLotteryResults('xsmb');
+  const xsmbSource = getLotterySource('xsmb')!;
+  const liveWindow = getLiveDrawWindow(xsmbSource);
+  const liveOptions = liveWindow.shouldPoll
+    ? {
+        code: xsmbSource.code,
+        shortName: xsmbSource.shortName,
+        scheme: xsmbSource.scheme,
+        liveWindow,
+        initialResult: latest?.date === liveWindow.date ? toLiveLotteryResult(latest) : null
+      }
+    : null;
+  const boardResult = latest || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' }
@@ -39,10 +53,10 @@ export default async function HomePage() {
 
       <section className="searchPanel">
         <div className="date-picker-title">Tra cứu kết quả xổ số theo ngày</div>
-        <DateSearchForm defaultDate={latest?.date} code="xsmb" />
+        <DateSearchForm defaultDate={liveOptions?.liveWindow.date || boardResult?.date} code="xsmb" />
       </section>
 
-      {latest ? <ResultBoard result={latest} /> : <DataUnavailable />}
+      {boardResult ? <ResultBoard result={boardResult} live={liveOptions} /> : <DataUnavailable />}
 
       {recent.length ? <RecentResults results={recent} title="XSMB các ngày gần đây" /> : null}
 

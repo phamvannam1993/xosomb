@@ -15,7 +15,7 @@ export type PrizeSpec = {
 
 export type PrizeSchemeId = 'north' | 'southCentral';
 
-export type LotteryDataSource = 'api' | 'rss' | 'html' | 'cache' | 'mock';
+export type LotteryDataSource = 'api' | 'live-api' | 'rss' | 'html' | 'cache' | 'mock';
 
 export type LotterySourceConfig = {
   code: string;
@@ -46,6 +46,29 @@ export type LotteryResult = {
   fetchedAt?: string;
   dataSource?: LotteryDataSource;
   isMock?: boolean;
+};
+
+
+export type LotteryLiveStatus = 'waiting' | 'running' | 'complete';
+
+export type LotteryLiveResult = Omit<LotteryResult, 'specialPrize'> & {
+  specialPrize?: string;
+  isComplete: boolean;
+  status: LotteryLiveStatus;
+  completenessScore: number;
+  expectedScore: number;
+};
+
+export type LiveDrawWindow = {
+  code: string;
+  date: string;
+  drawTime: string;
+  startTime: string;
+  endTime: string;
+  isLiveWindow: boolean;
+  shouldPoll: boolean;
+  pollIntervalMs: number;
+  label: string;
 };
 
 export type DigitStat = {

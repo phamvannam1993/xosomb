@@ -1,5 +1,5 @@
 import type { VietlottProductConfig, VietlottProductId, VietlottPrizeRow, VietlottResult } from './types';
-import { compactMoney, extractMoneyLikeValues, normalizeDateFromText } from './format';
+import { compactMoney, extractMoneyLikeValues, isFutureDate, isYyyyMmDd, normalizeDateFromText } from './format';
 
 const rowLabels = [
   'Jackpot 1',
@@ -279,7 +279,7 @@ function mainNumbersFromRows(rows: VietlottPrizeRow[]) {
 }
 
 function isValidVietlottResult(result: VietlottResult | null | undefined): result is VietlottResult {
-  if (!result || !result.date || result.numbers.length === 0 || result.rows.length === 0) return false;
+  if (!result || !isYyyyMmDd(result.date) || isFutureDate(result.date) || result.numbers.length === 0 || result.rows.length === 0) return false;
 
   if (result.product === 'mega-645' || result.product === 'power-655') {
     const limit = result.product === 'power-655' ? 55 : 45;

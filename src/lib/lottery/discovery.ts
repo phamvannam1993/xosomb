@@ -37,8 +37,22 @@ function isMatchingAnchor(anchorText: string, source: LotterySourceConfig) {
   return candidateNames(source).some((candidate) => candidate && (normalized.includes(candidate) || candidate.includes(normalized)));
 }
 
+function envRssUrlForSource(source: LotterySourceConfig) {
+  const codeKey = `${source.code.toUpperCase()}_RSS_URL`;
+  const regionKey = `LOTTERY_RSS_URL_${source.region.toUpperCase()}`;
+
+  return (
+    process.env[codeKey] ||
+    process.env[regionKey] ||
+    process.env.LOTTERY_RSS_URL ||
+    source.rssUrl ||
+    null
+  );
+}
+
 export async function discoverRssUrl(source: LotterySourceConfig): Promise<string | null> {
-  if (source.rssUrl) return source.rssUrl;
+  const configuredUrl = envRssUrlForSource(source);
+  if (configuredUrl) return configuredUrl;
   if (rssUrlCache.has(source.code)) return rssUrlCache.get(source.code) || null;
 
   try {

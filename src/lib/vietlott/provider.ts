@@ -1,6 +1,6 @@
 import { getVietlottProduct } from './catalog';
 import { readCachedVietlottResult, readRecentCachedVietlottResults, writeCachedVietlottResult, writeCachedVietlottResults } from './cache';
-import { isYyyyMmDd, todayInVietnam } from './format';
+import { isFutureDate, isYyyyMmDd, todayInVietnam } from './format';
 import { fetchRecentVietlottFromHtml, fetchVietlottFromHtml } from './html';
 import { mockRecentVietlott, mockVietlottByDate, mockVietlottLatest } from './mock';
 import { isValidVietlottResult, normalizeVietlottApiResult } from './normalize';
@@ -114,6 +114,8 @@ export async function getVietlottResult(productId = 'mega-645', date?: string): 
   if (!product) return null;
 
   const normalizedDate = normalizeDate(date);
+  if (isFutureDate(normalizedDate)) return null;
+
   const mode = providerMode();
 
   if (mode === 'mock') return mockVietlottByDate(product.id, normalizedDate);

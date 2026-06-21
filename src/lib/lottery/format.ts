@@ -1,27 +1,50 @@
 import type { DigitStat, LotteryResult } from './types';
 
-export function toVietnameseDate(dateValue: string) {
+export function todayInVietnam(now = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(now);
+}
+
+export function parseYyyyMmDd(dateValue?: string | null): Date | null {
+  if (!dateValue || !/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return null;
+
   const [year, month, day] = dateValue.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+export function isYyyyMmDd(dateValue: string) {
+  return Boolean(parseYyyyMmDd(dateValue));
+}
+
+export function isFutureDate(dateValue: string) {
+  return isYyyyMmDd(dateValue) && dateValue > todayInVietnam();
+}
+
+export function toVietnameseDate(dateValue: string) {
+  const date = parseYyyyMmDd(dateValue);
+  if (!date) return dateValue;
+
   return new Intl.DateTimeFormat('vi-VN', {
     weekday: 'long',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     timeZone: 'Asia/Ho_Chi_Minh'
-  }).format(new Date(Date.UTC(year, month - 1, day)));
-}
-
-export function todayInVietnam() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(new Date());
-}
-
-export function isYyyyMmDd(dateValue: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(dateValue);
+  }).format(date);
 }
 
 export function yyyyMmDdToXsktPathDate(dateValue: string) {
@@ -64,7 +87,8 @@ export function normalizeDateFromText(value: string): string | null {
   const monthNum = parseInt(month, 10);
   if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) return null;
 
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  const normalized = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return isYyyyMmDd(normalized) ? normalized : null;
 }
 
 export function normalizeDateFromPubDate(value?: string): string | null {

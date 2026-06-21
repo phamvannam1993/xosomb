@@ -8,7 +8,9 @@ import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
 import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
-import { isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
+import { getLotterySource } from '@/lib/lottery/catalog';
+import { isFutureDate, isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
+import { createLivePlaceholderResult, getLiveDrawWindow, toLiveLotteryResult } from '@/lib/lottery/live';
 import { getLotteryResult } from '@/lib/lottery/provider';
 
 function BreadcrumbListSchema({ schema }: { schema: string }) {
@@ -21,7 +23,7 @@ type PageProps = { params: Promise<{ date: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { date } = await params;
-  if (!isYyyyMmDd(date)) return { title: 'Ngày không hợp lệ', robots: { index: false, follow: false } };
+  if (!isYyyyMmDd(date) || isFutureDate(date)) return { title: 'Không tìm thấy dữ liệu', robots: { index: false, follow: false } };
 
   const result = await getLotteryResult('xsmb', date).catch(() => null);
   const canonical = absoluteUrl(`/xsmb/${date}`);
@@ -44,8 +46,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function XsmbByDatePage({ params }: PageProps) {
   const { date } = await params;
-  if (!isYyyyMmDd(date)) notFound();
+  if (!isYyyyMmDd(date) || isFutureDate(date)) notFound();
+  const xsmbSource = getLotterySource('xsmb')!;
   const result = await getLotteryResult('xsmb', date);
+  const liveWindow = getLiveDrawWindow(xsmbSource);
+  const liveOptions = liveWindow.shouldPoll && date === liveWindow.date
+    ? {
+        code: xsmbSource.code,
+        shortName: xsmbSource.shortName,
+        scheme: xsmbSource.scheme,
+        liveWindow,
+        initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
+      }
+    : null;
+  const boardResult = result || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' },
@@ -62,8 +76,8 @@ export default async function XsmbByDatePage({ params }: PageProps) {
         <div className="date-picker-title">Tra cứu XSMB theo ngày</div>
         <DateSearchForm defaultDate={date} code="xsmb" />
       </section>
-      {result ? (
-        <ResultBoard result={result} />
+      {boardResult ? (
+        <ResultBoard result={boardResult} live={liveOptions} />
       ) : (
         <DataUnavailable
           title={`Chưa có dữ liệu XSMB ${date}`}

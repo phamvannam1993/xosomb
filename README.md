@@ -26,11 +26,15 @@ Mở `http://localhost:3000`.
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://xosomb.vn
-LOTTERY_PROVIDER=auto
+LOTTERY_PROVIDER=rss
 LOTTERY_ALLOW_MOCK_FALLBACK=false
 LOTTERY_FILE_CACHE=true
 LOTTERY_REVALIDATE_SECONDS=60
+XSMB_RSS_URL=https://xskt.com.vn/rss-feed/mien-bac-xsmb.rss
+XSMB_RSS_SOURCE_NAME=XSKT RSS
 ```
+
+Nếu muốn RSS là nguồn chính nhưng vẫn fallback HTML/API khi RSS chậm, dùng `LOTTERY_PROVIDER=auto`. Không nên để trùng 2 dòng `LOTTERY_PROVIDER` trong cùng một file `.env`.
 
 Khi cập nhật từ bản cũ, nên xóa cache cũ:
 

@@ -1788,3 +1788,232 @@ input[type='date'] {
   color: #666;
   margin-top: 1rem;
 }
+
+.livePanel {
+  background: linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%);
+  border: 1px solid #f0d8a8;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(130, 84, 24, 0.08);
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.livePanelHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+}
+
+.livePanelHeader h2 {
+  color: #8b1e12;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  margin: 2px 0 8px;
+}
+
+.livePanelHeader p {
+  color: #6b5a45;
+  margin: 0;
+}
+
+.liveEyebrow {
+  color: #c0392b !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.liveStatus {
+  background: #fff0d6;
+  border: 1px solid #f2c879;
+  border-radius: 999px;
+  color: #955c00;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.liveStatus.complete {
+  background: #eaf7e8;
+  border-color: #b7ddb0;
+  color: #2b6e28;
+}
+
+.liveError {
+  background: #fff2f1;
+  border-top: 1px solid #ffd2ce;
+  color: #a12b22;
+  margin: 0;
+  padding: 10px 20px;
+}
+
+.liveTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.liveTable tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.livePrizeLabel {
+  border-top: 1px solid #f2dfbd;
+  color: #6b4b18;
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: center;
+  white-space: nowrap;
+  width: 86px;
+}
+
+.livePrizeNumbers {
+  border-top: 1px solid #f2dfbd;
+  padding: 12px 14px;
+}
+
+.liveSpecialRow .livePrizeLabel,
+.liveSpecialRow .livePrizeNumbers {
+  background: rgba(255, 245, 230, 0.75);
+}
+
+.waitingNumber {
+  color: #9b8b76;
+  display: inline-block;
+  font-style: italic;
+  padding: 5px 0;
+}
+
+.liveMeta {
+  align-items: center;
+  background: rgba(255, 250, 240, 0.72);
+  border-top: 1px solid #f2dfbd;
+  color: #6b5a45;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.86rem;
+  gap: 10px 18px;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+@media (max-width: 720px) {
+  .livePanelHeader {
+    display: block;
+  }
+
+  .liveStatus {
+    display: inline-block;
+    margin-top: 12px;
+  }
+
+  .livePrizeLabel {
+    width: 58px;
+  }
+}
+
+/* Live xổ số trực tiếp ngay trong bảng kết quả */
+.resultBoard[data-live='true'] {
+  border-color: #cf2f35;
+  border-width: 2px;
+}
+
+.resultBoard[data-live='true'] .lotteryTable th,
+.resultBoard[data-live='true'] .lotteryTable td {
+  border-color: #e3d1bd;
+}
+
+.codeRow[data-live='running'],
+.codeRow[data-live='waiting'] {
+  color: #7a3f00;
+  background: #fff0d0;
+  font-size: clamp(0.95rem, 2.2vw, 1.08rem);
+  font-weight: 900;
+}
+
+.codeRow[data-live='complete'] {
+  color: #a05c00;
+  background: #fff5df;
+}
+
+.liveInlineError {
+  color: #b42318;
+  font-weight: 800;
+}
+
+.livePendingSlot {
+  display: inline-grid;
+  min-width: 68px;
+  min-height: 34px;
+  place-items: center;
+}
+
+.liveSpinRing {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 6px solid rgba(139, 189, 70, 0.22);
+  border-top-color: #8bbd46;
+  border-radius: 999px;
+  animation: liveRingSpin 0.86s linear infinite;
+}
+
+.liveActiveNumber {
+  min-width: 104px;
+  padding: 7px 13px;
+  color: #fff !important;
+  background: linear-gradient(180deg, #d92a2f 0%, #a90f18 100%);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  box-shadow:
+    0 10px 24px rgba(190, 27, 32, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -4px 0 rgba(80, 0, 0, 0.18);
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+
+.specialNumber.liveActiveNumber {
+  min-height: 48px;
+  font-size: clamp(2rem, 5vw, 2.65rem);
+}
+
+.resultBoard[data-live='true'] .numberGrid {
+  min-height: 36px;
+}
+
+.resultBoard[data-live='true'] .specialLabel {
+  color: var(--brand);
+}
+
+.resultBoard[data-live='true'] .lotoTitle {
+  color: #7a3f00;
+  background: #fffaf2;
+}
+
+@keyframes liveRingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 420px) {
+  .liveActiveNumber {
+    min-width: 72px;
+    padding: 6px 9px;
+  }
+
+  .livePendingSlot {
+    min-width: 54px;
+  }
+
+  .liveSpinRing {
+    width: 24px;
+    height: 24px;
+    border-width: 5px;
+  }
+}
