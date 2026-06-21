@@ -1076,7 +1076,7 @@ input[type='date'] {
   .numberGrid,
   .numberGrid.count-2,
   .numberGrid.count-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .specialNumber {
@@ -1297,11 +1297,11 @@ input[type='date'] {
 
 @media (max-width: 620px) {
   .tabHeader {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .miniLinkGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .navDropdown {
