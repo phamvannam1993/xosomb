@@ -3,7 +3,7 @@ export const siteConfig = {
   domain: 'xosomb.vn',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://xosomb.vn',
   description:
-    'Tra cứu kết quả xổ số nhanh, rõ ràng, có dữ liệu theo ngày, bảng lô tô 2 số cuối và thống kê tham khảo.'
+    'XoSoMB.vn tra cứu XSMB hôm nay, kết quả xổ số miền Bắc, miền Nam, miền Trung và Vietlott nhanh, rõ ràng, có sổ kết quả theo ngày.'
 };
 
 export function absoluteUrl(path = '/') {

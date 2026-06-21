@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { DataUnavailable } from '@/components/DataUnavailable';
 import { DateSearchForm } from '@/components/DateSearchForm';
 import { DisclaimerBox } from '@/components/DisclaimerBox';
 import { LotteryShell } from '@/components/LotteryShell';
@@ -61,6 +60,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
       }
     : null;
   const boardResult = result || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
+  if (!boardResult) notFound();
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' },
@@ -77,14 +77,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
         <div className="date-picker-title">Tra cứu XSMB theo ngày</div>
         <DateSearchForm defaultDate={date} code="xsmb" />
       </section>
-      {boardResult ? (
-        <ResultBoard result={boardResult} live={liveOptions} />
-      ) : (
-        <DataUnavailable
-          title={`Chưa có dữ liệu XSMB ngày ${ddMmYyyyFromDate(date)}`}
-          message="Kết quả XSMB cho ngày này chưa sẵn sàng. Vui lòng chọn ngày khác hoặc quay lại sau."
-        />
-      )}
+      <ResultBoard result={boardResult!} live={liveOptions} />
       <DisclaimerBox />
       </LotteryShell>
     </>

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { DataUnavailable } from '@/components/DataUnavailable';
 import { LotteryShell } from '@/components/LotteryShell';
 import { VietlottBoard } from '@/components/vietlott/VietlottBoard';
 import { VietlottTabs } from '@/components/vietlott/VietlottTabs';
@@ -34,17 +33,15 @@ export default async function VietlottDatePage({ params }: PageProps) {
   const { product: productParam, date } = await params;
   const product = getVietlottProduct(productParam);
   if (!product || !isYyyyMmDd(date) || isFutureDate(date)) notFound();
+  const resolvedProduct = product!;
 
-  const result = await getVietlottResult(product.id, date);
+  const result = await getVietlottResult(resolvedProduct.id, date);
+  if (!result) notFound();
 
   return (
     <LotteryShell>
-      <VietlottTabs active={product.id} />
-      {result ? (
-        <VietlottBoard result={result} />
-      ) : (
-        <DataUnavailable title={`Chưa có dữ liệu ${product.shortName} ${dateTextForSeo(date)}`} message="Kết quả ngày này chưa sẵn sàng. Vui lòng chọn ngày quay thưởng khác hoặc quay lại sau." />
-      )}
+      <VietlottTabs active={resolvedProduct.id} />
+      <VietlottBoard result={result!} />
     </LotteryShell>
   );
 }

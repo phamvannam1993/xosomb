@@ -290,8 +290,8 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
           </tr>
           <tr>
             <td colSpan={2} className="codeRow" data-live={isLiveMode ? liveResult?.status || 'running' : 'complete'}>
-              {isLiveMode ? liveStatus : 'Tường thuật kết quả đầy đủ'}
-              {updatedAtText ? ` · Cập nhật: ${updatedAtText}` : null}
+              {isLiveMode ? liveStatus : `Kết quả đầy đủ ngày ${displayDateText}`}
+              {updatedAtText ? ` · ${isLiveMode ? 'Cập nhật' : 'Dữ liệu kiểm tra lúc'}: ${updatedAtText}` : null}
               {liveError ? <span className="liveInlineError"> · {liveError}</span> : null}
             </td>
           </tr>

@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 export default async function XsmbThirtyDaysPage() {
   const recent = await getRecentLotteryResults('xsmb');
   const latest = recent[0] || null;
+  const sampleResult = recent[1] || latest;
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' },
@@ -57,9 +58,14 @@ export default async function XsmbThirtyDaysPage() {
       <section className="contentPanel seoText">
         <h2>Cách sử dụng sổ kết quả 30 ngày</h2>
         <p>
-          Danh sách trên hiển thị tất cả kết quả 30 ngày gần nhất. Bảng chi tiết dưới đây là kết quả mới nhất.{' '}
-          <strong>Nhấp vào bất kỳ ngày nào trong danh sách</strong> để xem bảng kết quả đầy đủ cho ngày đó (ví dụ:{' '}
-          <Link href="/xsmb/2026-06-19">kết quả ngày 19/06/2026</Link>).
+          Danh sách trên hiển thị các kết quả gần nhất. Bảng chi tiết dưới đây là kết quả mới nhất để đối chiếu nhanh.{' '}
+          <strong>Nhấp vào bất kỳ ngày nào trong danh sách</strong> để xem bảng kết quả đầy đủ cho ngày đó
+          {sampleResult ? (
+            <>
+              {' '}
+              (ví dụ: <Link href={`/xsmb/${sampleResult.date}`}>kết quả ngày {sampleResult.date.split('-').reverse().join('/')}</Link>).
+            </>
+          ) : null}
         </p>
         <p>
           Mỗi ngày có một trang riêng với đường dẫn cố định, giúp bạn dễ dàng lưu và chia sẻ kết quả.

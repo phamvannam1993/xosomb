@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'XoSoMB.vn',
     short_name: 'XoSoMB',
-    description: 'Tra cứu kết quả xổ số miền Bắc',
+    description: 'Tra cứu XSMB hôm nay, kết quả xổ số miền Bắc và sổ kết quả theo ngày.',
     start_url: '/',
     display: 'standalone',
     background_color: '#f8fafc',

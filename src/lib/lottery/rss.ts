@@ -3,6 +3,7 @@ import { normalizeLiveResultFromText, normalizeResultFromText } from './normaliz
 import { normalizeDateFromPubDate, normalizeDateFromText } from './format';
 import { stripHtml } from './text';
 import { discoverRssUrl } from './discovery';
+import { fetchWithTimeout, numberFromEnv } from '@/lib/fetch-utils';
 
 export type RssItem = {
   title: string;
@@ -82,7 +83,8 @@ async function fetchRssXml(source: LotterySourceConfig, options: RssFetchOptions
   const rssUrl = await discoverRssUrl(source);
   if (!rssUrl) return { rssUrl: null, xml: null };
 
-  const response = await fetch(rssUrl, {
+  const timeoutMs = numberFromEnv(['LOTTERY_RSS_TIMEOUT_MS', 'XSMB_RSS_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 5000);
+  const response = await fetchWithTimeout(rssUrl, {
     headers: {
       Accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
       'User-Agent': 'xosomb.vn data fetcher/1.0'
@@ -96,7 +98,7 @@ async function fetchRssXml(source: LotterySourceConfig, options: RssFetchOptions
             )
           }
         })
-  });
+  }, timeoutMs);
 
   if (!response.ok) throw new Error(`Không lấy được RSS ${source.shortName}: ${response.status}`);
 

@@ -154,11 +154,24 @@ const footerColumns = [
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: siteConfig.name,
-  url: siteConfig.url,
-  inLanguage: 'vi-VN',
-  description: siteConfig.description
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteConfig.url}#website`,
+      name: siteConfig.name,
+      url: siteConfig.url,
+      inLanguage: 'vi-VN',
+      description: siteConfig.description
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteConfig.url}#organization`,
+      name: siteConfig.name,
+      url: siteConfig.url,
+      logo: absoluteUrl('/icon.svg'),
+      description: siteConfig.description
+    }
+  ]
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -2,6 +2,7 @@ import type { LotteryResult, LotterySourceConfig } from './types';
 import { isCompleteLotteryResult, normalizeResultFromText } from './normalize';
 import { ddMmYyyyFromDate, normalizeDateFromText, yyyyMmDdToXsktPathDate } from './format';
 import { discoverPageUrl } from './discovery';
+import { fetchWithTimeout, numberFromEnv } from '@/lib/fetch-utils';
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -101,13 +102,14 @@ export async function fetchLotteryFromHtml(source: LotterySourceConfig, date?: s
   if (!pageUrl) return null;
 
   const url = buildDateUrl(pageUrl, date);
-  const response = await fetch(url, {
+  const timeoutMs = numberFromEnv(['LOTTERY_HTML_TIMEOUT_MS', 'XSMB_HTML_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 6000);
+  const response = await fetchWithTimeout(url, {
     headers: {
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'xosomb.vn data fetcher/1.0'
     },
     next: { revalidate: Number(process.env.LOTTERY_REVALIDATE_SECONDS || process.env.XSMB_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Không lấy được HTML ${source.shortName}: ${response.status}`);
@@ -138,10 +140,11 @@ export async function fetchRecentLotteryFromHtml(source: LotterySourceConfig, li
   if (!pageUrl) return [];
 
   const url = `${pageUrl.replace(/\/$/, '')}/30-ngay`;
-  const response = await fetch(url, {
+  const timeoutMs = numberFromEnv(['LOTTERY_HTML_TIMEOUT_MS', 'XSMB_HTML_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 6000);
+  const response = await fetchWithTimeout(url, {
     headers: { Accept: 'text/html,application/xhtml+xml', 'User-Agent': 'xosomb.vn data fetcher/1.0' },
     next: { revalidate: Number(process.env.LOTTERY_REVALIDATE_SECONDS || process.env.XSMB_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (!response.ok) return [];
   const text = cleanPageText(await response.text());
