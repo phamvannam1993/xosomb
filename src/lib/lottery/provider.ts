@@ -290,6 +290,7 @@ export async function getLatestLotteryResult(code = 'xsmb'): Promise<LotteryResu
 export async function getRecentLotteryResults(code = 'xsmb', limit = 30): Promise<LotteryResult[]> {
   const source = resolveSource(code);
   const mode = providerMode();
+  const today = todayInVietnam();
 
   if (mode === 'mock') return mockRecentByCode(source.code, limit);
 
@@ -313,13 +314,15 @@ export async function getRecentLotteryResults(code = 'xsmb', limit = 30): Promis
   const cached = completeList(await readRecentCachedResults(source.code, limit), limit);
   if (cached.length) groups.push(cached);
 
-  const merged = mergeLotteryResults(...groups).slice(0, limit);
+  const merged = mergeLotteryResults(...groups)
+    .filter((result) => result.date <= today)
+    .slice(0, limit);
   if (merged.length) {
     await writeCachedResults(merged);
     return merged;
   }
 
-  return allowMockFallback() ? completeList(mockRecentByCode(source.code, limit), limit) : [];
+  return allowMockFallback() ? completeList(mockRecentByCode(source.code, limit), limit).filter((r) => r.date <= today) : [];
 }
 
 export function getLotteryRuntimeConfig() {

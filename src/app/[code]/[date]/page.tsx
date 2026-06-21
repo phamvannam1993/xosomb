@@ -7,8 +7,8 @@ import { LotteryShell } from '@/components/LotteryShell';
 import { MarketTabs } from '@/components/MarketTabs';
 import { ResultBoard } from '@/components/ResultBoard';
 import { getLotterySource } from '@/lib/lottery/catalog';
-import { isYyyyMmDd, toVietnameseDate } from '@/lib/lottery/format';
-import { getLotteryResult } from '@/lib/lottery/provider';
+import { isYyyyMmDd, toVietnameseDate, todayInVietnam } from '@/lib/lottery/format';
+import { getLotteryResult, getLatestLotteryResult } from '@/lib/lottery/provider';
 import { absoluteUrl } from '@/lib/site';
 
 export const revalidate = 60;
@@ -18,7 +18,7 @@ type PageProps = { params: Promise<{ code: string; date: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { code, date } = await params;
   const source = getLotterySource(code);
-  if (!source || !isYyyyMmDd(date)) return { title: 'Không tìm thấy dữ liệu', robots: { index: false, follow: true } };
+  if (!source || !isYyyyMmDd(date) || date > todayInVietnam()) return { title: 'Không tìm thấy dữ liệu', robots: { index: false, follow: false } };
 
   const result = await getLotteryResult(source.code, date).catch(() => null);
   const canonical = absoluteUrl(`/${source.code}/${date}`);
@@ -42,23 +42,33 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LotteryCodeDatePage({ params }: PageProps) {
   const { code, date } = await params;
   const source = getLotterySource(code);
-  if (!source || !isYyyyMmDd(date)) notFound();
+  if (!source || !isYyyyMmDd(date) || date > todayInVietnam()) notFound();
 
   const result = await getLotteryResult(source.code, date);
+  const latest = result || (await getLatestLotteryResult(source.code).catch(() => null));
 
   return (
     <LotteryShell>
       <MarketTabs />
       <section className="searchPanel">
-        <h2>Tra cứu {source.shortName} theo ngày</h2>
+        <div className="date-picker-title">Tra cứu {source.shortName} theo ngày</div>
         <DateSearchForm defaultDate={date} code={source.code} />
       </section>
-      {result ? (
-        <ResultBoard result={result} />
+      {latest ? (
+        <>
+          <ResultBoard result={latest} />
+          {!result && (
+            <div className="contentPanel seoText">
+              <p className="dataNotFoundMessage">
+                Không có dữ liệu cho ngày {date}. Hiển thị kết quả mới nhất từ ngày {latest.date}.
+              </p>
+            </div>
+          )}
+        </>
       ) : (
         <DataUnavailable
-          title={`Chưa có dữ liệu ${source.shortName} ${date}`}
-          message="Kết quả cho ngày này chưa sẵn sàng. Vui lòng chọn ngày khác hoặc quay lại sau."
+          title={`Chưa có dữ liệu ${source.shortName}`}
+          message="Kết quả chưa sẵn sàng. Vui lòng quay lại sau."
         />
       )}
       <DisclaimerBox />

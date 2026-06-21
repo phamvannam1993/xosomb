@@ -8,7 +8,12 @@ import { MarketTabs } from '@/components/MarketTabs';
 import { RecentResults } from '@/components/RecentResults';
 import { ResultBoard } from '@/components/ResultBoard';
 import { absoluteUrl } from '@/lib/site';
+import { generateBreadcrumbListSchema } from '@/lib/metadata-utils';
 import { getLatestLotteryResult, getRecentLotteryResults } from '@/lib/lottery/provider';
+
+function BreadcrumbListSchema({ schema }: { schema: string }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
+}
 
 export const revalidate = 60;
 
@@ -22,12 +27,18 @@ export default async function HomePage() {
   const latest = await getLatestLotteryResult('xsmb');
   const recent = await getRecentLotteryResults('xsmb');
 
+  const breadcrumbSchema = generateBreadcrumbListSchema([
+    { name: 'Trang chủ', path: '/' }
+  ]);
+
   return (
-    <LotteryShell>
-      <MarketTabs />
+    <>
+      <BreadcrumbListSchema schema={breadcrumbSchema} />
+      <LotteryShell>
+        <MarketTabs />
 
       <section className="searchPanel">
-        <h2>Tra cứu kết quả xổ số theo ngày</h2>
+        <div className="date-picker-title">Tra cứu kết quả xổ số theo ngày</div>
         <DateSearchForm defaultDate={latest?.date} code="xsmb" />
       </section>
 
@@ -48,6 +59,7 @@ export default async function HomePage() {
       </section>
 
       <DisclaimerBox />
-    </LotteryShell>
+      </LotteryShell>
+    </>
   );
 }

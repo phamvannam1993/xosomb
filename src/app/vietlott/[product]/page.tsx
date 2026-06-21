@@ -38,7 +38,7 @@ export default async function VietlottProductPage({ params }: PageProps) {
     <LotteryShell>
       <VietlottTabs active={product.id} />
       <section className="searchPanel">
-        <h2>Chọn ngày xem {product.shortName}</h2>
+        <div className="date-picker-title">Chọn ngày xem {product.shortName}</div>
         <DateSearchForm defaultDate={result?.date} code={`vietlott/${product.id}`} />
         <p className="mutedText">{product.schedule}</p>
       </section>

@@ -151,15 +151,6 @@ const footerColumns = [
   }
 ];
 
-const keywordLinks = [
-  { label: 'xsmb', href: '/xsmb' },
-  { label: 'xổ số miền Bắc', href: '/xsmb' },
-  { label: 'kết quả xsmb', href: '/xsmb' },
-  { label: 'xsmb 30 ngày', href: '/xsmb-30-ngay' },
-  { label: 'lịch mở thưởng', href: '/lich-mo-thuong' },
-  { label: 'vietlott hôm nay', href: '/vietlott' }
-];
-
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -219,7 +210,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="footerTopGrid">
               {footerColumns.map((column) => (
                 <section className="footerColumn" key={column.title}>
-                  <h2>{column.title}</h2>
+                  <div className="footerColumnTitle">{column.title}</div>
                   <ul>
                     {column.links.map((item) => (
                       <li key={`${column.title}-${item.href}-${item.label}`}>
@@ -231,19 +222,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ))}
             </div>
 
-            <div className="footerKeywords" aria-label="Từ khóa tìm kiếm phổ biến">
-              <span>Từ khóa tìm kiếm:</span>
-              <div>
-                {keywordLinks.map((item) => (
-                  <Link href={item.href} key={item.label}>{item.label}</Link>
-                ))}
-              </div>
-            </div>
-
             <div className="footerBottom">
               <div className="footerAbout">
-                <p><strong>{siteConfig.domain}</strong> - Trang tra cứu kết quả xổ số miền Bắc và kết quả xổ số theo tỉnh.</p>
-                <p>Dữ liệu được trình bày để tham khảo, cập nhật thường xuyên và hỗ trợ người dùng xem lại kết quả theo ngày.</p>
+                <p><strong>{siteConfig.domain}</strong> - Tra cứu kết quả xổ số ba miền cập nhật hàng ngày.</p>
+                <p>Dữ liệu tham khảo, không phải gợi ý dự đoán hay khuyến cáo đầu tư.</p>
                 <p>Website không bán vé, không mua hộ vé và không nhận đặt cược dưới mọi hình thức.</p>
               </div>
 
