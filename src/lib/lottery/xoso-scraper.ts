@@ -1,15 +1,30 @@
 import type { LotteryResult } from './types';
 
+// Simple cache untuk mengurangi fetch frequency
+let cachedResult: LotteryResult | null = null;
+let cachedTime = 0;
+const CACHE_DURATION = 5000; // 5 seconds cache
+
 export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryResult | null> {
   try {
+    // Return cached result jika masih fresh
+    if (cachedResult && Date.now() - cachedTime < CACHE_DURATION) {
+      return cachedResult;
+    }
+
     // Fetch homepage which contains today's lottery results
     const url = 'https://xoso.com.vn/';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html'
       },
-      cache: 'no-store'
-    });
+      cache: 'no-store',
+      signal: controller.signal
+    }).finally(() => clearTimeout(timeoutId));
 
     if (!response.ok) return null;
 
@@ -37,7 +52,7 @@ export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryRes
     // If no data found, return null
     if (!specialPrize) return null;
 
-    return {
+    const result: LotteryResult = {
       date,
       code: 'xsmb',
       region: 'north',
@@ -61,6 +76,12 @@ export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryRes
       fetchedAt: new Date().toISOString(),
       dataSource: 'html'
     };
+
+    // Cache result
+    cachedResult = result;
+    cachedTime = Date.now();
+
+    return result;
   } catch (error) {
     console.error('Error fetching from xoso.com.vn:', error);
     return null;

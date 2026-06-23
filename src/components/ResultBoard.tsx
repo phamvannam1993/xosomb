@@ -276,7 +276,8 @@ function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoard
       currentWindow.date === live.liveWindow.date &&
       (currentWindow.shouldPoll || hasCurrentLiveData)
   );
-  const shouldPoll = Boolean(live && currentWindow?.shouldPoll && !liveResult?.isComplete && currentWindow.date);
+  // Poll continuously during live window (even after complete) to get updates
+  const shouldPoll = Boolean(live && currentWindow?.shouldPoll && currentWindow.date);
   const liveCode = live?.code;
   const liveDate = currentWindow?.date;
   const pollIntervalMs = currentWindow?.pollIntervalMs;
