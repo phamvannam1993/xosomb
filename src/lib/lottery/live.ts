@@ -61,7 +61,7 @@ function drawTimeForSource(source: LotterySourceConfig) {
 export function getLiveDrawWindow(source: LotterySourceConfig, now = new Date()): LiveDrawWindow {
   const startBeforeMinutes = numberFromEnv('LOTTERY_LIVE_START_BEFORE_MINUTES', 10);
   const endAfterMinutes = numberFromEnv('LOTTERY_LIVE_END_AFTER_MINUTES', 75);
-  const fastPollMs = numberFromEnv('LOTTERY_LIVE_FAST_POLL_MS', 8000);
+  const fastPollMs = numberFromEnv('LOTTERY_LIVE_FAST_POLL_MS', 5000);
   const slowPollMs = numberFromEnv('LOTTERY_LIVE_SLOW_POLL_MS', 15000);
 
   const vietnamNow = vietnamDateTimeParts(now);
@@ -85,7 +85,8 @@ export function getLiveDrawWindow(source: LotterySourceConfig, now = new Date())
   };
 }
 
-export function shouldShowLivePanel(source: LotterySourceConfig, _result?: LotteryResult | null) {
+export function shouldShowLivePanel(source: LotterySourceConfig, result?: LotteryResult | null) {
+  void result;
   const liveWindow = getLiveDrawWindow(source);
   return liveWindow.shouldPoll;
 }

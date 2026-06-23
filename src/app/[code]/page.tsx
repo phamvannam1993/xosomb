@@ -140,16 +140,14 @@ export default async function LotteryCodePage({ params }: PageProps) {
   const result = await getLatestLotteryResult(resolvedSource.code);
   const recent = await getRecentLotteryResults(resolvedSource.code);
   const liveWindow = getLiveDrawWindow(resolvedSource);
-  const liveOptions = liveWindow.shouldPoll
-    ? {
-        code: resolvedSource.code,
-        shortName: resolvedSource.shortName,
-        scheme: resolvedSource.scheme,
-        liveWindow,
-        initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
-      }
-    : null;
-  const boardResult = result || (liveOptions ? createLivePlaceholderResult(resolvedSource, liveWindow.date) : null);
+  const liveOptions = {
+    code: resolvedSource.code,
+    shortName: resolvedSource.shortName,
+    scheme: resolvedSource.scheme,
+    liveWindow,
+    initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
+  };
+  const boardResult = result || (liveWindow.shouldPoll ? createLivePlaceholderResult(resolvedSource, liveWindow.date) : null);
   const displayName = provinceName(resolvedSource.name);
   const isRegion = isRegionPage(resolvedSource.code);
   const breadcrumbSchema = generateBreadcrumbListSchema([
@@ -164,7 +162,7 @@ export default async function LotteryCodePage({ params }: PageProps) {
         <MarketTabs />
         <section className="searchPanel">
           <div className="date-picker-title">Chọn ngày xem {resolvedSource.shortName}</div>
-          <DateSearchForm defaultDate={liveOptions?.liveWindow.date || boardResult?.date} code={resolvedSource.code} />
+          <DateSearchForm defaultDate={liveWindow.shouldPoll ? liveWindow.date : boardResult?.date} code={resolvedSource.code} />
         </section>
         {boardResult ? (
           <>

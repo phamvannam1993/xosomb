@@ -50,7 +50,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
   const xsmbSource = getLotterySource('xsmb')!;
   const result = await getLotteryResult('xsmb', date);
   const liveWindow = getLiveDrawWindow(xsmbSource);
-  const liveOptions = liveWindow.shouldPoll && date === liveWindow.date
+  const liveOptions = date === liveWindow.date
     ? {
         code: xsmbSource.code,
         shortName: xsmbSource.shortName,
@@ -59,7 +59,7 @@ export default async function XsmbByDatePage({ params }: PageProps) {
         initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
       }
     : null;
-  const boardResult = result || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
+  const boardResult = result || (liveWindow.shouldPoll && liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
   if (!boardResult) notFound();
 
   const breadcrumbSchema = generateBreadcrumbListSchema([

@@ -30,16 +30,14 @@ export default async function HomePage() {
   const recent = await getRecentLotteryResults('xsmb');
   const xsmbSource = getLotterySource('xsmb')!;
   const liveWindow = getLiveDrawWindow(xsmbSource);
-  const liveOptions = liveWindow.shouldPoll
-    ? {
-        code: xsmbSource.code,
-        shortName: xsmbSource.shortName,
-        scheme: xsmbSource.scheme,
-        liveWindow,
-        initialResult: latest?.date === liveWindow.date ? toLiveLotteryResult(latest) : null
-      }
-    : null;
-  const boardResult = latest || (liveOptions ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
+  const liveOptions = {
+    code: xsmbSource.code,
+    shortName: xsmbSource.shortName,
+    scheme: xsmbSource.scheme,
+    liveWindow,
+    initialResult: latest?.date === liveWindow.date ? toLiveLotteryResult(latest) : null
+  };
+  const boardResult = latest || (liveWindow.shouldPoll ? createLivePlaceholderResult(xsmbSource, liveWindow.date) : null);
 
   const breadcrumbSchema = generateBreadcrumbListSchema([
     { name: 'Trang chủ', path: '/' }
@@ -53,7 +51,7 @@ export default async function HomePage() {
 
       <section className="searchPanel">
         <div className="date-picker-title">Tra cứu kết quả xổ số theo ngày</div>
-        <DateSearchForm defaultDate={liveOptions?.liveWindow.date || boardResult?.date} code="xsmb" />
+        <DateSearchForm defaultDate={liveWindow.shouldPoll ? liveWindow.date : boardResult?.date} code="xsmb" />
       </section>
 
       {boardResult ? <ResultBoard result={boardResult} live={liveOptions} /> : <DataUnavailable />}

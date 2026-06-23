@@ -3,15 +3,17 @@ import type { LotteryLiveResult, LotteryResult, ProviderMode } from './types';
 import { isFutureDate, isYyyyMmDd, todayInVietnam } from './format';
 import { isCompleteLotteryResult, liveResultToCompleteLotteryResult, normalizeApiResult, normalizeLiveApiResult, pickBetterLotteryResult } from './normalize';
 import { fetchLiveLotteryFromRss, fetchLotteryFromRss } from './rss';
-import { fetchLotteryFromHtml, fetchRecentLotteryFromHtml } from './html';
+import { mergeLiveLotteryResults } from './live-state';
+import { fetchLiveLotteryFromHtml, fetchLotteryFromHtml, fetchRecentLotteryFromHtml } from './html';
 import { readCachedResult, readRecentCachedResults, writeCachedResult, writeCachedResults } from './cache';
 import { mockByCodeDate, mockLatestByCode, mockRecentByCode } from './mock';
 
 function providerMode(): ProviderMode {
-  const value = (process.env.LOTTERY_PROVIDER || process.env.XSMB_PROVIDER || 'mock').toLowerCase();
+  const value = (process.env.LOTTERY_PROVIDER || process.env.XSMB_PROVIDER || 'auto').toLowerCase();
   if (value === 'api' || value === 'rss' || value === 'html' || value === 'auto' || value === 'mock') return value;
-  return 'mock';
+  return 'auto';
 }
+
 
 function allowMockFallback() {
   if (process.env.LOTTERY_ALLOW_MOCK_FALLBACK === 'false' || process.env.XSMB_ALLOW_MOCK_FALLBACK === 'false') return false;
@@ -132,6 +134,17 @@ function onlyComplete(result: LotteryResult | null): LotteryResult | null {
   return isCompleteLotteryResult(result) ? result : null;
 }
 
+function completeResultToLive(result: LotteryResult): LotteryLiveResult {
+  const score = result.prizes.reduce((total, row) => total + row.numbers.length, 0);
+  return {
+    ...result,
+    isComplete: true,
+    status: 'complete',
+    completenessScore: score,
+    expectedScore: score
+  };
+}
+
 function completeList(results: LotteryResult[], limit?: number) {
   const complete = results.filter(isCompleteLotteryResult);
   return typeof limit === 'number' ? complete.slice(0, limit) : complete;
@@ -161,54 +174,53 @@ export async function getLiveLotteryResult(code = 'xsmb', date?: string): Promis
   const normalizedDate = normalizeDate(date);
   if (isFutureDate(normalizedDate)) return null;
 
-  const cached = await readCachedResult(source.code, normalizedDate);
-  if (isCompleteLotteryResult(cached)) return {
-    ...cached,
-    isComplete: true,
-    status: 'complete',
-    completenessScore: cached.prizes.reduce((score, row) => score + row.numbers.length, 0),
-    expectedScore: cached.prizes.reduce((score, row) => score + row.numbers.length, 0)
-  };
-
   const mode = providerMode();
   if (mode === 'mock') {
     const mock = onlyComplete(mockByCodeDate(source.code, normalizedDate));
-    return mock
-      ? {
-          ...mock,
-          isComplete: true,
-          status: 'complete',
-          completenessScore: mock.prizes.reduce((score, row) => score + row.numbers.length, 0),
-          expectedScore: mock.prizes.reduce((score, row) => score + row.numbers.length, 0)
-        }
-      : null;
+    return mock ? completeResultToLive(mock) : null;
+  }
+
+  const cached = await readCachedResult(source.code, normalizedDate);
+  if (isCompleteLotteryResult(cached) && cached.dataSource !== 'mock' && !cached.isMock) {
+    return completeResultToLive(cached);
+  }
+
+  // RSS/API là nguồn live chính và được gọi song song. Trang HTML chỉ là
+  // fallback trong chế độ auto để không làm mọi vòng polling phải chờ HTML chậm.
+  const primaryRequests: Array<Promise<LotteryLiveResult | null>> = [];
+
+  if (mode === 'rss' || mode === 'auto') {
+    primaryRequests.push(fetchLiveLotteryFromRss(source, normalizedDate, { noStore: true, cacheBust: true }));
   }
 
   if (mode === 'api' || mode === 'auto') {
-    const liveResult = await fetchLiveFromExternalApi(source.code, normalizedDate).catch(() => null);
-    const complete = liveResultToCompleteLotteryResult(liveResult);
-    if (complete) await writeCachedResult(complete);
-    if (liveResult) return liveResult;
+    primaryRequests.push(fetchLiveFromExternalApi(source.code, normalizedDate));
   }
 
-  // RSS của XSKT có thể cập nhật từng giải trong lúc quay số.
-  // Fetch no-store để polling live nhận được dữ liệu mới nhất, không bị kẹt cache 60s.
-  if (mode === 'rss' || mode === 'auto') {
-    const liveResult = await fetchLiveLotteryFromRss(source, normalizedDate, { noStore: true }).catch(() => null);
-    const complete = liveResultToCompleteLotteryResult(liveResult);
-    if (complete) await writeCachedResult(complete);
-    if (liveResult) return liveResult;
+  if (mode === 'html') {
+    primaryRequests.push(fetchLiveLotteryFromHtml(source, normalizedDate));
   }
 
+  const primaryCandidates = await Promise.all(primaryRequests.map((request) => request.catch(() => null)));
+  let liveResult = primaryCandidates.reduce<LotteryLiveResult | null>(
+    (best, candidate) => mergeLiveLotteryResults(best, candidate),
+    null
+  );
+
+  if (!liveResult && mode === 'auto' && normalizedDate === todayInVietnam()) {
+    const htmlFallback = await fetchLiveLotteryFromHtml(source, normalizedDate).catch(() => null);
+    liveResult = mergeLiveLotteryResults(liveResult, htmlFallback);
+  }
+
+  const complete = liveResultToCompleteLotteryResult(liveResult);
+  if (complete) await writeCachedResult(complete);
+  if (liveResult) return liveResult;
+
+  // Fallback cuối chỉ dùng kết quả đầy đủ; tuyệt đối không dùng mock ngầm cho live.
+  // Mock hôm nay sẽ khiến client tưởng đã hoàn tất và dừng polling nguồn thật.
   const completeResult = await getLotteryResult(source.code, normalizedDate).catch(() => null);
-  if (isCompleteLotteryResult(completeResult)) {
-    return {
-      ...completeResult,
-      isComplete: true,
-      status: 'complete',
-      completenessScore: completeResult.prizes.reduce((score, row) => score + row.numbers.length, 0),
-      expectedScore: completeResult.prizes.reduce((score, row) => score + row.numbers.length, 0)
-    };
+  if (isCompleteLotteryResult(completeResult) && completeResult.dataSource !== 'mock') {
+    return completeResultToLive(completeResult);
   }
 
   return null;
@@ -353,17 +365,21 @@ export async function getRecentLotteryResults(code = 'xsmb', limit = 30): Promis
 }
 
 export function getLotteryRuntimeConfig() {
+  const provider = providerMode();
+  const hasBuiltInLiveSource = provider === 'auto' || provider === 'rss' || provider === 'html';
+
   return {
-    provider: providerMode(),
+    provider,
     hasApiEndpoint: Boolean(process.env.LOTTERY_DATA_API || process.env.XSMB_DATA_API),
     hasHistoryEndpoint: Boolean(process.env.LOTTERY_HISTORY_API || process.env.XSMB_HISTORY_API),
-    hasLiveEndpoint: Boolean(
+    hasLiveEndpoint: hasBuiltInLiveSource || Boolean(
       process.env.LOTTERY_LIVE_API ||
         process.env.XSMB_LIVE_API ||
         process.env.LOTTERY_DATA_API ||
         process.env.XSMB_DATA_API ||
         process.env.LOTTERY_RSS_URL ||
-        process.env.XSMB_RSS_URL
+        process.env.XSMB_RSS_URL ||
+        process.env.LOTTERY_LIVE_HTML_URL
     ),
     fileCacheEnabled: process.env.LOTTERY_FILE_CACHE !== 'false' && process.env.XSMB_FILE_CACHE !== 'false',
     allowMockFallback: allowMockFallback()

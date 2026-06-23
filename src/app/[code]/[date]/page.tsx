@@ -59,7 +59,7 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
 
   const result = await getLotteryResult(resolvedSource.code, date);
   const liveWindow = getLiveDrawWindow(resolvedSource);
-  const liveOptions = liveWindow.shouldPoll && date === liveWindow.date
+  const liveOptions = date === liveWindow.date
     ? {
         code: resolvedSource.code,
         shortName: resolvedSource.shortName,
@@ -68,7 +68,7 @@ export default async function LotteryCodeDatePage({ params }: PageProps) {
         initialResult: result?.date === liveWindow.date ? toLiveLotteryResult(result) : null
       }
     : null;
-  const boardResult = result || (liveOptions ? createLivePlaceholderResult(resolvedSource, liveWindow.date) : null);
+  const boardResult = result || (liveWindow.shouldPoll && liveOptions ? createLivePlaceholderResult(resolvedSource, liveWindow.date) : null);
   if (!boardResult) notFound();
 
   const breadcrumbSchema = generateBreadcrumbListSchema([

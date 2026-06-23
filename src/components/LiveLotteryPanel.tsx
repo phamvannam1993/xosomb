@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LiveDrawWindow, LotteryLiveResult, PrizeSchemeId } from '@/lib/lottery/types';
 import { getPrizeSpecs, getShortPrizeLabel } from '@/lib/lottery/schemes';
 import { toVietnameseDate } from '@/lib/lottery/format';
+import { hasLiveDrawStarted, isUsableInitialLiveResult, mergeLiveLotteryResults, refreshLiveDrawWindow } from '@/lib/lottery/live-state';
 
 type LiveLotteryPanelProps = {
   code: string;
@@ -20,21 +21,34 @@ type LiveApiPayload = {
   error?: string;
 };
 
+function formatVietnamDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+}
+
 function statusText(result: LotteryLiveResult | null, liveWindow: LiveDrawWindow, isChecking: boolean) {
   if (result?.isComplete) return 'Đã có kết quả đầy đủ';
-  if (result?.prizes?.length) return 'Đang tường thuật, có dữ liệu nào sẽ hiển thị ngay';
+  if (result?.prizes?.some((row) => row.numbers.length)) {
+    return liveWindow.shouldPoll ? 'Đang tường thuật, có dữ liệu nào sẽ hiển thị ngay' : 'Kết quả tạm thời - đã hết khung cập nhật trực tiếp';
+  }
+  if (!hasLiveDrawStarted(liveWindow)) {
+    return isChecking ? `Chờ quay lúc ${liveWindow.drawTime} · đang kiểm tra nguồn` : `Chờ quay lúc ${liveWindow.drawTime}`;
+  }
   if (isChecking) return 'Đang kiểm tra dữ liệu mới...';
-  if (liveWindow.shouldPoll) return 'Sắp đến giờ quay, hệ thống đang tự động cập nhật';
-  return 'Chưa đến giờ tường thuật trực tiếp';
+  if (liveWindow.shouldPoll) return 'Đang chờ dữ liệu từ nguồn';
+  return 'Đã kết thúc khung giờ tường thuật';
 }
 
 function numberKey(label: string, value: string, index: number) {
   return `${label}-${value}-${index}`;
 }
 
-export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialResult = null }: LiveLotteryPanelProps) {
-  const [result, setResult] = useState<LotteryLiveResult | null>(initialResult);
-  const [currentWindow, setCurrentWindow] = useState(liveWindow);
+function LiveLotteryPanelInner({ code, shortName, scheme, liveWindow, initialResult = null }: LiveLotteryPanelProps) {
+  const [result, setResult] = useState<LotteryLiveResult | null>(() =>
+    isUsableInitialLiveResult(initialResult) ? initialResult : null
+  );
+  const [currentWindow, setCurrentWindow] = useState(() => refreshLiveDrawWindow(liveWindow));
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastCheckedAt, setLastCheckedAt] = useState<string | null>(null);
@@ -51,12 +65,22 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
     };
   }, []);
 
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setCurrentWindow((current) => refreshLiveDrawWindow(current)),
+      15_000
+    );
+    return () => window.clearInterval(timer);
+  }, []);
+
   const prizeSpecs = useMemo(() => getPrizeSpecs(scheme), [scheme]);
   const rowsByLabel = useMemo(() => new Map((result?.prizes || []).map((row) => [row.label, row.numbers])), [result]);
   const shouldPoll = currentWindow.shouldPoll && !result?.isComplete;
+  const liveDate = currentWindow.date;
+  const pollIntervalMs = currentWindow.pollIntervalMs;
 
   const fetchLiveResult = useCallback(async () => {
-    if (!currentWindow.date || !isMountedRef.current) return;
+    if (!liveDate || !isMountedRef.current) return;
 
     liveAbortRef.current?.abort();
     const controller = new AbortController();
@@ -66,16 +90,18 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
     setError(null);
 
     try {
-      const params = new URLSearchParams({ code, date: currentWindow.date, t: String(Date.now()) });
+      const params = new URLSearchParams({ code, date: liveDate, t: String(Date.now()) });
       const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store', signal: controller.signal });
-      const payload = (await response.json()) as LiveApiPayload;
+      const payload = (await response.json().catch(() => ({}))) as LiveApiPayload;
 
       if (!isMountedRef.current || controller.signal.aborted) return;
 
-      if (payload.liveWindow) setCurrentWindow(payload.liveWindow);
+      if (payload.liveWindow?.date === liveDate) setCurrentWindow(payload.liveWindow);
       if (!response.ok) throw new Error(payload.error || 'Không kiểm tra được dữ liệu live');
-      if (payload.data) setResult(payload.data);
-      setLastCheckedAt(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      if (payload.data?.date === liveDate) {
+        setResult((current) => mergeLiveLotteryResults(current, payload.data || null));
+      }
+      setLastCheckedAt(new Date().toISOString());
     } catch (fetchError) {
       if (!isMountedRef.current || controller.signal.aborted) return;
       setError(fetchError instanceof Error ? fetchError.message : 'Không kiểm tra được dữ liệu live');
@@ -87,15 +113,25 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
         liveAbortRef.current = null;
       }
     }
-  }, [code, currentWindow.date]);
+  }, [code, liveDate]);
 
   useEffect(() => {
-    if (!shouldPoll) return undefined;
+    if (!shouldPoll || !pollIntervalMs) return undefined;
 
-    fetchLiveResult();
-    const timer = window.setInterval(fetchLiveResult, currentWindow.pollIntervalMs);
-    return () => window.clearInterval(timer);
-  }, [currentWindow.pollIntervalMs, fetchLiveResult, shouldPoll]);
+    let cancelled = false;
+    let timer: number | undefined;
+
+    const poll = async () => {
+      await fetchLiveResult();
+      if (!cancelled) timer = window.setTimeout(poll, pollIntervalMs);
+    };
+
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [fetchLiveResult, pollIntervalMs, shouldPoll]);
 
   if (!currentWindow.shouldPoll && !result) return null;
 
@@ -128,7 +164,10 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
                   {numbers.length ? (
                     <div className={`numberGrid count-${Math.max(numbers.length, 1)}`}>
                       {numbers.map((numberValue, index) => (
-                        <span className={spec.isSpecial ? 'drawNumber specialNumber' : 'drawNumber'} key={numberKey(spec.label, numberValue, index)}>
+                        <span
+                          className={spec.isSpecial ? 'drawNumber specialNumber' : 'drawNumber'}
+                          key={numberKey(spec.label, numberValue, index)}
+                        >
                           {numberValue}
                         </span>
                       ))}
@@ -145,11 +184,17 @@ export function LiveLotteryPanel({ code, shortName, scheme, liveWindow, initialR
 
       <div className="liveMeta">
         <span>
-          Tiến độ: {result?.completenessScore || 0}/{result?.expectedScore || prizeSpecs.reduce((sum, spec) => sum + spec.count, 0)} số
+          Tiến độ: {result?.completenessScore || 0}/
+          {result?.expectedScore || prizeSpecs.reduce((sum, spec) => sum + spec.count, 0)} số
         </span>
-        {lastCheckedAt ? <span>Kiểm tra gần nhất: {lastCheckedAt}</span> : null}
-        {result?.updatedAt ? <span>Nguồn cập nhật: {new Date(result.updatedAt).toLocaleString('vi-VN')}</span> : null}
+        {lastCheckedAt ? <span>Kiểm tra gần nhất: {formatVietnamDateTime(lastCheckedAt)}</span> : null}
+        {result?.updatedAt ? <span>Nguồn cập nhật: {formatVietnamDateTime(result.updatedAt)}</span> : null}
       </div>
     </section>
   );
+}
+
+export function LiveLotteryPanel(props: LiveLotteryPanelProps) {
+  const key = `${props.code}:${props.liveWindow.date}:${props.initialResult?.updatedAt || 'empty'}`;
+  return <LiveLotteryPanelInner key={key} {...props} />;
 }

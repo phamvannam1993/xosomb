@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { LiveDrawWindow, LotteryLiveResult, LotteryResult, PrizeRow, PrizeSchemeId, PrizeSpec } from '@/lib/lottery/types';
 import { buildHeadTailTable, ddMmYyyyFromDate, toVietnameseDate } from '@/lib/lottery/format';
 import { getPrizeSpecs, getShortPrizeLabel } from '@/lib/lottery/schemes';
+import { hasLiveDrawStarted, isUsableInitialLiveResult, mergeLiveLotteryResults, refreshLiveDrawWindow } from '@/lib/lottery/live-state';
 
 type DisplayMode = 'all' | 'last2' | 'last3';
 type CellState = 'done' | 'active' | 'pending';
@@ -59,18 +60,20 @@ function titleFor(result: LotteryResult) {
 }
 
 function liveDrawOrder(specs: PrizeSpec[], scheme: PrizeSchemeId) {
-  // Giao diện bảng miền Bắc vẫn đặt ĐB lên trên, nhưng khi quay trực tiếp thì ĐB thường để cuối.
-  // Như vậy các ô G1/G2/G3... quay kiểu giống trang quay thử, còn ĐB vẫn hiện vòng quay chờ.
+  // Bảng XSMB hiển thị ĐB ở trên cùng, nhưng thứ tự quay thực tế đi từ G7 lên G1 rồi mới tới ĐB.
   if (scheme !== 'north') return specs;
-  return [...specs.filter((spec) => !spec.isSpecial), ...specs.filter((spec) => spec.isSpecial)];
+  return [...specs.filter((spec) => !spec.isSpecial).reverse(), ...specs.filter((spec) => spec.isSpecial)];
 }
 
 function rowsMap(rows: PrizeRow[] = []) {
   return new Map(rows.map((row) => [row.label, row.numbers]));
 }
 
-function inferCurrentPosition(result: LotteryLiveResult | null, scheme: PrizeSchemeId): CurrentPosition {
+function inferCurrentPosition(result: LotteryLiveResult | null, scheme: PrizeSchemeId, drawStarted: boolean): CurrentPosition {
   const specs = liveDrawOrder(getPrizeSpecs(scheme), scheme);
+  const hasNumbers = Boolean(result?.prizes.some((row) => row.numbers.length));
+
+  if (!drawStarted && !hasNumbers) return null;
   if (!result) {
     const firstSpec = specs[0];
     return firstSpec ? { label: firstSpec.label, slotIndex: 0 } : null;
@@ -110,21 +113,30 @@ function liveStatusText(
   result: LotteryLiveResult | null,
   currentPosition: CurrentPosition,
   scheme: PrizeSchemeId,
-  isChecking: boolean
+  isChecking: boolean,
+  isWindowActive: boolean,
+  drawStarted: boolean,
+  drawTime: string
 ) {
   if (result?.isComplete) return 'Tường thuật kết quả đầy đủ';
+  if (!isWindowActive && result?.prizes.some((row) => row.numbers.length)) {
+    return 'Kết quả tạm thời - đã hết khung cập nhật trực tiếp';
+  }
+  if (!drawStarted && !result?.prizes.some((row) => row.numbers.length)) {
+    return isChecking ? `Chờ quay lúc ${drawTime} · đang kiểm tra nguồn` : `Chờ quay lúc ${drawTime}`;
+  }
   if (currentPosition) {
     return `Đang quay ${getShortPrizeLabel(scheme, currentPosition.label)} - ô ${currentPosition.slotIndex + 1}`;
   }
   if (isChecking) return 'Đang kiểm tra dữ liệu mới';
-  return 'Chuẩn bị quay số';
+  return drawStarted ? 'Đang chờ dữ liệu từ nguồn' : 'Chuẩn bị quay số';
 }
 
 function formatUpdatedAt(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString('vi-VN');
+  return date.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
 }
 
 function buildLiveRows(specs: PrizeSpec[], liveResult: LotteryLiveResult | null): PrizeRow[] {
@@ -209,11 +221,16 @@ function PrizeNumberCell({
   );
 }
 
-export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoardProps) {
+function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoardProps) {
   const [mode, setMode] = useState<DisplayMode>('all');
   const [activeDigit, setActiveDigit] = useState<string | null>(null);
-  const [liveResult, setLiveResult] = useState<LotteryLiveResult | null>(live?.initialResult || null);
-  const [currentWindow, setCurrentWindow] = useState<LiveDrawWindow | null>(live?.liveWindow || null);
+  const [liveResult, setLiveResult] = useState<LotteryLiveResult | null>(() =>
+    isUsableInitialLiveResult(live?.initialResult) ? live?.initialResult || null : null
+  );
+  const [currentWindow, setCurrentWindow] = useState<LiveDrawWindow | null>(() =>
+    live?.liveWindow ? refreshLiveDrawWindow(live.liveWindow) : null
+  );
+  const [clockNow, setClockNow] = useState(() => Date.now());
   const [isChecking, setIsChecking] = useState(false);
   const [lastCheckedAt, setLastCheckedAt] = useState<string | null>(null);
   const [liveError, setLiveError] = useState<string | null>(null);
@@ -230,13 +247,42 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
     };
   }, []);
 
+  useEffect(() => {
+    if (!live) return undefined;
+
+    const timer = window.setInterval(() => {
+      const now = new Date();
+      setClockNow(now.getTime());
+      setCurrentWindow((current) => (current ? refreshLiveDrawWindow(current, now) : current));
+    }, 15_000);
+    return () => window.clearInterval(timer);
+  }, [live]);
+
   const prizeSpecs = useMemo(() => getPrizeSpecs(result.scheme), [result.scheme]);
-  const currentPosition = useMemo(() => inferCurrentPosition(liveResult, result.scheme), [liveResult, result.scheme]);
-  const isLiveMode = Boolean(live && currentWindow?.shouldPoll);
-  const shouldPoll = Boolean(isLiveMode && !liveResult?.isComplete && currentWindow?.date);
+  const drawStarted = currentWindow ? hasLiveDrawStarted(currentWindow, new Date(clockNow)) : false;
+  const currentPosition = useMemo(
+    () => inferCurrentPosition(liveResult, result.scheme, drawStarted),
+    [drawStarted, liveResult, result.scheme]
+  );
+  const hasCurrentLiveData = Boolean(
+    liveResult &&
+      currentWindow &&
+      liveResult.date === currentWindow.date &&
+      (liveResult.isComplete || liveResult.prizes.some((row) => row.numbers.length > 0))
+  );
+  const isLiveMode = Boolean(
+    live &&
+      currentWindow &&
+      currentWindow.date === live.liveWindow.date &&
+      (currentWindow.shouldPoll || hasCurrentLiveData)
+  );
+  const shouldPoll = Boolean(live && currentWindow?.shouldPoll && !liveResult?.isComplete && currentWindow.date);
+  const liveCode = live?.code;
+  const liveDate = currentWindow?.date;
+  const pollIntervalMs = currentWindow?.pollIntervalMs;
 
   const fetchLiveResult = useCallback(async () => {
-    if (!live || !currentWindow?.date || !isMountedRef.current) return;
+    if (!liveCode || !liveDate || !isMountedRef.current) return;
 
     liveAbortRef.current?.abort();
     const controller = new AbortController();
@@ -246,15 +292,17 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
     setLiveError(null);
 
     try {
-      const params = new URLSearchParams({ code: live.code, date: currentWindow.date, t: String(Date.now()) });
+      const params = new URLSearchParams({ code: liveCode, date: liveDate, t: String(Date.now()) });
       const response = await fetch(`/api/lottery/live?${params.toString()}`, { cache: 'no-store', signal: controller.signal });
-      const payload = (await response.json()) as LiveApiPayload;
+      const payload = (await response.json().catch(() => ({}))) as LiveApiPayload;
 
       if (!isMountedRef.current || controller.signal.aborted) return;
 
-      if (payload.liveWindow) setCurrentWindow(payload.liveWindow);
+      if (payload.liveWindow?.date === liveDate) setCurrentWindow(payload.liveWindow);
       if (!response.ok) throw new Error(payload.error || 'Không kiểm tra được dữ liệu live');
-      if (payload.data) setLiveResult(payload.data);
+      if (payload.data?.date === liveDate) {
+        setLiveResult((current) => mergeLiveLotteryResults(current, payload.data || null));
+      }
       setLastCheckedAt(new Date().toISOString());
     } catch (error) {
       if (!isMountedRef.current || controller.signal.aborted) return;
@@ -267,35 +315,52 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
         liveAbortRef.current = null;
       }
     }
-  }, [currentWindow?.date, live]);
+  }, [liveCode, liveDate]);
 
   useEffect(() => {
-    if (!shouldPoll || !currentWindow?.pollIntervalMs) return undefined;
+    if (!shouldPoll || !pollIntervalMs) return undefined;
 
-    fetchLiveResult();
-    const timer = window.setInterval(fetchLiveResult, currentWindow.pollIntervalMs);
-    return () => window.clearInterval(timer);
-  }, [currentWindow?.pollIntervalMs, fetchLiveResult, shouldPoll]);
+    let cancelled = false;
+    let timer: number | undefined;
+
+    const poll = async () => {
+      await fetchLiveResult();
+      if (!cancelled) timer = window.setTimeout(poll, pollIntervalMs);
+    };
+
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [fetchLiveResult, pollIntervalMs, shouldPoll]);
 
   const liveRows = useMemo(() => buildLiveRows(prizeSpecs, liveResult), [liveResult, prizeSpecs]);
   const displayRows = isLiveMode ? liveRows : result.prizes;
   const displayDate = isLiveMode && currentWindow?.date ? currentWindow.date : result.date;
-  const displayUpdatedAt = isLiveMode
-    ? liveResult?.updatedAt || lastCheckedAt || result.updatedAt
-    : result.updatedAt;
+  const displayUpdatedAt = isLiveMode ? liveResult?.updatedAt || lastCheckedAt : result.updatedAt;
 
   const headTailRows = buildHeadTailTable({
     ...result,
     date: displayDate,
     specialPrize: isLiveMode ? liveResult?.specialPrize || '' : result.specialPrize,
     prizes: displayRows.filter((row) => row.numbers.length),
-    updatedAt: displayUpdatedAt
+    updatedAt: displayUpdatedAt || result.updatedAt
   });
   const dateText = toVietnameseDate(displayDate);
   const displayDateText = ddMmYyyyFromDate(displayDate);
   const HeadingTag = headingLevel === 1 ? 'h1' : 'h2';
   const updatedAtText = formatUpdatedAt(displayUpdatedAt);
-  const liveStatus = liveStatusText(liveResult, currentPosition, result.scheme, isChecking);
+  const liveStatus = liveStatusText(
+    liveResult,
+    currentPosition,
+    result.scheme,
+    isChecking,
+    Boolean(currentWindow?.shouldPoll),
+    drawStarted,
+    currentWindow?.drawTime || live?.liveWindow.drawTime || ''
+  );
+  const liveRowStatus = liveResult?.status || (drawStarted ? 'running' : 'waiting');
 
   return (
     <article className="resultBoard" id={`${result.code}-${displayDate}`} data-live={isLiveMode ? 'true' : 'false'}>
@@ -313,7 +378,7 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
             </th>
           </tr>
           <tr>
-            <td colSpan={2} className="codeRow" data-live={isLiveMode ? liveResult?.status || 'running' : 'complete'}>
+            <td colSpan={2} className="codeRow" data-live={isLiveMode ? liveRowStatus : 'complete'}>
               {isLiveMode ? liveStatus : `Kết quả đầy đủ ngày ${displayDateText}`}
               {updatedAtText ? ` · ${isLiveMode ? 'Cập nhật' : 'Dữ liệu kiểm tra lúc'}: ${updatedAtText}` : null}
               {liveError ? <span className="liveInlineError"> · {liveError}</span> : null}
@@ -423,4 +488,9 @@ export function ResultBoard({ result, headingLevel = 1, live = null }: ResultBoa
       </table>
     </article>
   );
+}
+
+export function ResultBoard(props: ResultBoardProps) {
+  const key = `${props.result.code}:${props.result.date}:${props.live?.liveWindow.date || 'static'}:${props.live?.initialResult?.updatedAt || 'empty'}`;
+  return <ResultBoardInner key={key} {...props} />;
 }

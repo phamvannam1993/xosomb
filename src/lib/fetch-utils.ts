@@ -13,6 +13,18 @@ export function numberFromEnv(names: string[], fallback: number) {
   return fallback;
 }
 
+export function cacheBustUrl(input: string, key = '_live', bucketMs = 2000) {
+  try {
+    const url = new URL(input);
+    const safeBucketMs = Number.isFinite(bucketMs) && bucketMs > 0 ? bucketMs : 2000;
+    url.searchParams.set(key, String(Math.floor(Date.now() / safeBucketMs)));
+    return url.toString();
+  } catch {
+    const separator = input.includes('?') ? '&' : '?';
+    return `${input}${separator}${encodeURIComponent(key)}=${Math.floor(Date.now() / Math.max(bucketMs, 1))}`;
+  }
+}
+
 export async function fetchWithTimeout(
   input: Parameters<typeof fetch>[0],
   init: NextFetchInit = {},

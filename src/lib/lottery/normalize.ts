@@ -10,6 +10,10 @@ const LABEL_ALIASES: Record<string, string> = {
   'đặc biệt': 'Đặc biệt',
   gdb: 'Đặc biệt',
   'gdb.': 'Đặc biệt',
+  'g.db': 'Đặc biệt',
+  'g.đb': 'Đặc biệt',
+  'g db': 'Đặc biệt',
+  'g đb': 'Đặc biệt',
   g8: 'Giải tám',
   'g.8': 'Giải tám',
   tam: 'Giải tám',
@@ -222,7 +226,7 @@ export function parsePrizeRowsFromText(rawText: string, scheme: PrizeSchemeId): 
   const markerRows = sortRows(
     Array.from(rowMap.entries()).map(([label, numbers]) => ({
       label,
-      numbers: Array.from(new Set(numbers))
+      numbers
     })),
     scheme
   );
@@ -243,6 +247,8 @@ export function normalizePrizeRows(rows: PrizeRow[], scheme: PrizeSchemeId): Pri
   const expectedLengths = getExpectedLengthMap(scheme);
 
   for (const row of rows) {
+    if (!row || typeof row.label !== 'string' || !Array.isArray(row.numbers)) continue;
+
     const label = canonicalLabel(row.label) || row.label;
     const expectedLength = expectedLengths[label];
     if (!expectedLength) continue;
@@ -258,7 +264,7 @@ export function normalizePrizeRows(rows: PrizeRow[], scheme: PrizeSchemeId): Pri
 
   return trimToExpectedCounts(
     sortRows(
-      Array.from(rowMap.entries()).map(([label, numbers]) => ({ label, numbers: Array.from(new Set(numbers)) })),
+      Array.from(rowMap.entries()).map(([label, numbers]) => ({ label, numbers })),
       scheme
     ),
     scheme
@@ -491,6 +497,54 @@ export function normalizeLiveApiResult(
     completenessScore,
     expectedScore
   };
+}
+
+function liveResultUpdatedAt(value: LotteryLiveResult) {
+  const timestamp = new Date(value.updatedAt).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+export function pickBetterLiveResult(
+  current: LotteryLiveResult | null,
+  candidate: LotteryLiveResult | null
+): LotteryLiveResult | null {
+  if (!candidate) return current;
+  if (!current) return candidate;
+
+  if (candidate.date !== current.date) {
+    return candidate.date > current.date ? candidate : current;
+  }
+
+  if (candidate.isComplete !== current.isComplete) {
+    return candidate.isComplete ? candidate : current;
+  }
+
+  const currentScore = lotteryRowsCompletenessScore(current.prizes, current.scheme);
+  const candidateScore = lotteryRowsCompletenessScore(candidate.prizes, candidate.scheme);
+  if (candidateScore !== currentScore) return candidateScore > currentScore ? candidate : current;
+
+  const currentUpdatedAt = liveResultUpdatedAt(current);
+  const candidateUpdatedAt = liveResultUpdatedAt(candidate);
+  if (candidateUpdatedAt !== currentUpdatedAt) {
+    return candidateUpdatedAt > currentUpdatedAt ? candidate : current;
+  }
+
+  const priority: Record<string, number> = {
+    'live-api': 4,
+    html: 3,
+    rss: 2,
+    cache: 1,
+    api: 1,
+    mock: 0
+  };
+  const currentPriority = priority[current.dataSource || 'cache'] ?? 0;
+  const candidatePriority = priority[candidate.dataSource || 'cache'] ?? 0;
+  if (candidatePriority !== currentPriority) {
+    return candidatePriority > currentPriority ? candidate : current;
+  }
+
+  // Cùng tiến độ và thời điểm: lấy snapshot vừa fetch để chấp nhận dữ liệu nguồn đã sửa.
+  return candidate;
 }
 
 export function liveResultToCompleteLotteryResult(value: LotteryLiveResult | null): LotteryResult | null {

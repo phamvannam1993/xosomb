@@ -3,6 +3,7 @@ import { getLotterySource } from '@/lib/lottery/catalog';
 import { isFutureDate, isYyyyMmDd, todayInVietnam } from '@/lib/lottery/format';
 import { getLiveDrawWindow } from '@/lib/lottery/live';
 import { getLiveLotteryResult, getLotteryRuntimeConfig } from '@/lib/lottery/provider';
+import { fetchLiveFromXosoWebsite } from '@/lib/lottery/xoso-scraper';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,6 +12,9 @@ function json(data: unknown, init?: ResponseInit) {
   const response = NextResponse.json(data, init);
   response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  response.headers.set('CDN-Cache-Control', 'no-store');
+  response.headers.set('Surrogate-Control', 'no-store');
+  response.headers.set('Expires', '0');
   return response;
 }
 
@@ -32,8 +36,28 @@ export async function GET(request: NextRequest) {
     return json({ error: 'Không hỗ trợ truy vấn ngày tương lai', code: source.code, date }, { status: 404 });
   }
 
-  const liveWindow = getLiveDrawWindow(source);
-  const result = await getLiveLotteryResult(source.code, date).catch(() => null);
+  const currentLiveWindow = getLiveDrawWindow(source);
+  const isToday = date === todayInVietnam();
+  const liveWindow =
+    isToday
+      ? currentLiveWindow
+      : {
+          ...currentLiveWindow,
+          date,
+          isLiveWindow: false,
+          shouldPoll: false
+        };
+
+  // Try fetch from xoso.com.vn for live data, fallback to mock/RSS/API
+  let result = null;
+  if (isToday && source.code === 'xsmb') {
+    result = await fetchLiveFromXosoWebsite(date).catch(() => null);
+  }
+
+  // Fallback to provider (mock/RSS/API)
+  if (!result) {
+    result = await getLiveLotteryResult(source.code, date).catch(() => null);
+  }
 
   return json({
     code: source.code,
