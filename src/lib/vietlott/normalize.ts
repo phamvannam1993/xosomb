@@ -1,5 +1,6 @@
 import type { VietlottProductConfig, VietlottProductId, VietlottPrizeRow, VietlottResult } from './types';
 import { compactMoney, extractMoneyLikeValues, isFutureDate, isYyyyMmDd, normalizeDateFromText } from './format';
+import { getCurrentTimeInVietnam } from '../lottery/format';
 
 const rowLabels = [
   'Jackpot 1',
@@ -336,8 +337,8 @@ export function normalizeVietlottText(
     rows,
     sourceName: options.sourceName,
     sourceUrl: options.sourceUrl,
-    updatedAt: options.updatedAt || new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: options.updatedAt || getCurrentTimeInVietnam(),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: options.dataSource
   };
 
@@ -362,8 +363,8 @@ export function normalizeVietlottApiResult(payload: unknown, product: VietlottPr
     rows: Array.isArray(raw.rows) ? raw.rows : [],
     sourceName: raw.sourceName || 'API',
     sourceUrl: raw.sourceUrl,
-    updatedAt: raw.updatedAt || new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: raw.updatedAt || getCurrentTimeInVietnam(),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: 'api'
   };
 

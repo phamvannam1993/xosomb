@@ -291,7 +291,6 @@ export async function getLatestLotteryResult(code = 'xsmb'): Promise<LotteryResu
   if (mode === 'mock') return mockLatestByCode(source.code);
 
   let best: LotteryResult | null = null;
-
   if (mode === 'api' || mode === 'auto') {
     const todayApi = await fetchFromExternalApi(source.code, today).catch(() => null);
     best = pickBetterLotteryResult(best, todayApi);
@@ -321,7 +320,9 @@ export async function getLatestLotteryResult(code = 'xsmb'): Promise<LotteryResu
 
   const cached = await readRecentCachedResults(source.code, 1);
   best = pickBetterLotteryResult(best, cached[0] || null);
-  if (isCompleteLotteryResult(best)) return best;
+  if (isCompleteLotteryResult(best)) {
+    return best;
+  }
 
   return allowMockFallback() ? onlyComplete(mockLatestByCode(source.code)) : null;
 }

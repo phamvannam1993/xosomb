@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllLotterySources } from '@/lib/lottery/catalog';
 import { readRecentCachedResults } from '@/lib/lottery/cache';
-import { todayInVietnam } from '@/lib/lottery/format';
+import { getResultDisplayUpdatedAt, todayInVietnam } from '@/lib/lottery/format';
 import { getAllVietlottProducts } from '@/lib/vietlott/catalog';
 import { readRecentCachedVietlottResults } from '@/lib/vietlott/cache';
 import { siteConfig } from '@/lib/site';
@@ -49,7 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await Promise.all(
       lotterySources.map(async (source) => {
         const results = await readRecentCachedResults(source.code, 30);
-        return results.map((result) => entry(`/${source.code}/${result.date}`, result.updatedAt || result.date, 0.65, 'daily'));
+        return results.map((result) =>
+          entry(`/${source.code}/${result.date}`, getResultDisplayUpdatedAt(result) || result.date, 0.65, 'daily')
+        );
       })
     )
   ).flat();

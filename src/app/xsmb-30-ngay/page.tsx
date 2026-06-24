@@ -14,6 +14,7 @@ function BreadcrumbListSchema({ schema }: { schema: string }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
 }
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {

@@ -1,5 +1,5 @@
 import type { LotteryResult } from '@/lib/lottery/types';
-import { buildHeadTailTable, ddMmYyyyFromDate, toVietnameseDate } from '@/lib/lottery/format';
+import { buildHeadTailTable, ddMmYyyyFromDate, formatVietnamDateTime, getResultDisplayUpdatedAt, toVietnameseDate } from '@/lib/lottery/format';
 import { getShortPrizeLabel } from '@/lib/lottery/schemes';
 import { absoluteUrl } from '@/lib/site';
 
@@ -9,13 +9,6 @@ type Props = {
   result: LotteryResult;
   size: PrintSheetSize;
 };
-
-function formatDateTime(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString('vi-VN');
-}
 
 function resultPath(result: LotteryResult) {
   return result.code === 'xsmb' ? `/xsmb/${result.date}` : `/${result.code}/${result.date}`;
@@ -115,13 +108,13 @@ function LotoTable({ result, compact = false }: { result: LotteryResult; compact
 }
 
 function SheetFooter({ result }: { result: LotteryResult }) {
-  const checkedAt = formatDateTime(result.updatedAt || result.fetchedAt);
+  const checkedAt = formatVietnamDateTime(getResultDisplayUpdatedAt(result));
 
   return (
     <footer className="printSheetFooter">
       <p>Dữ liệu chỉ mang tính tham khảo. Phiếu dò này không phải vé số và không có giá trị lĩnh thưởng.</p>
       <p>
-        XoSoMB.vn · {checkedAt ? `Dữ liệu kiểm tra lúc: ${checkedAt}` : `Kết quả ngày ${ddMmYyyyFromDate(result.date)}`}
+        XoSoMB.vn · {checkedAt ? `Cập nhật lúc: ${checkedAt}` : `Kết quả ngày ${ddMmYyyyFromDate(result.date)}`}
       </p>
     </footer>
   );

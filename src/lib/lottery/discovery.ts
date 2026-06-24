@@ -1,6 +1,7 @@
 import type { LotterySourceConfig } from './types';
 import { absoluteXsktUrl, normalizeForCompare, stripHtml } from './text';
 import { XSKT_BASE_URL } from './catalog';
+import { fetchWithTimeout, numberFromEnv } from '@/lib/fetch-utils';
 
 const rssUrlCache = new Map<string, string | null>();
 const pageUrlCache = new Map<string, string | null>();
@@ -8,10 +9,11 @@ let rssIndexHtmlCache: string | null = null;
 
 async function fetchXsktIndexHtml() {
   if (rssIndexHtmlCache) return rssIndexHtmlCache;
-  const response = await fetch(`${XSKT_BASE_URL}/rss`, {
+  const timeoutMs = numberFromEnv(['LOTTERY_DISCOVERY_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 5000);
+  const response = await fetchWithTimeout(`${XSKT_BASE_URL}/rss`, {
     headers: { 'User-Agent': 'xosomb.vn data fetcher/1.0' },
     next: { revalidate: 3600 }
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`Không lấy được trang RSS XSKT: ${response.status}`);
   rssIndexHtmlCache = await response.text();
   return rssIndexHtmlCache;

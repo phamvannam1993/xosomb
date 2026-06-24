@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { LiveDrawWindow, LotteryLiveResult, LotteryResult, PrizeRow, PrizeSchemeId, PrizeSpec } from '@/lib/lottery/types';
-import { buildHeadTailTable, ddMmYyyyFromDate, toVietnameseDate } from '@/lib/lottery/format';
+import {
+  buildHeadTailTable,
+  ddMmYyyyFromDate,
+  formatVietnamDateTime,
+  getCurrentTimeInVietnam,
+  getResultDisplayUpdatedAt,
+  toVietnameseDate
+} from '@/lib/lottery/format';
 import { getPrizeSpecs, getShortPrizeLabel } from '@/lib/lottery/schemes';
 import { hasLiveDrawStarted, isUsableInitialLiveResult, mergeLiveLotteryResults, refreshLiveDrawWindow } from '@/lib/lottery/live-state';
 
@@ -130,13 +137,6 @@ function liveStatusText(
   }
   if (isChecking) return 'Đang kiểm tra dữ liệu mới';
   return drawStarted ? 'Đang chờ dữ liệu từ nguồn' : 'Chuẩn bị quay số';
-}
-
-function formatUpdatedAt(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
 }
 
 function buildLiveRows(specs: PrizeSpec[], liveResult: LotteryLiveResult | null): PrizeRow[] {
@@ -304,7 +304,7 @@ function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoard
       if (payload.data?.date === liveDate) {
         setLiveResult((current) => mergeLiveLotteryResults(current, payload.data || null));
       }
-      setLastCheckedAt(new Date().toISOString());
+      setLastCheckedAt(getCurrentTimeInVietnam());
     } catch (error) {
       if (!isMountedRef.current || controller.signal.aborted) return;
       setLiveError(error instanceof Error ? error.message : 'Không kiểm tra được dữ liệu live');
@@ -339,7 +339,7 @@ function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoard
   const liveRows = useMemo(() => buildLiveRows(prizeSpecs, liveResult), [liveResult, prizeSpecs]);
   const displayRows = isLiveMode ? liveRows : result.prizes;
   const displayDate = isLiveMode && currentWindow?.date ? currentWindow.date : result.date;
-  const displayUpdatedAt = isLiveMode ? liveResult?.updatedAt || lastCheckedAt : result.updatedAt;
+  const displayUpdatedAt = isLiveMode ? liveResult?.updatedAt || lastCheckedAt : getResultDisplayUpdatedAt(result);
 
   const headTailRows = buildHeadTailTable({
     ...result,
@@ -351,7 +351,7 @@ function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoard
   const dateText = toVietnameseDate(displayDate);
   const displayDateText = ddMmYyyyFromDate(displayDate);
   const HeadingTag = headingLevel === 1 ? 'h1' : 'h2';
-  const updatedAtText = formatUpdatedAt(displayUpdatedAt);
+  const updatedAtText = formatVietnamDateTime(displayUpdatedAt);
   const liveStatus = liveStatusText(
     liveResult,
     currentPosition,
@@ -381,7 +381,7 @@ function ResultBoardInner({ result, headingLevel = 1, live = null }: ResultBoard
           <tr>
             <td colSpan={2} className="codeRow" data-live={isLiveMode ? liveRowStatus : 'complete'}>
               {isLiveMode ? liveStatus : `Kết quả đầy đủ ngày ${displayDateText}`}
-              {updatedAtText ? ` · ${isLiveMode ? 'Cập nhật' : 'Dữ liệu kiểm tra lúc'}: ${updatedAtText}` : null}
+              {updatedAtText ? ` · ${isLiveMode ? 'Cập nhật' : 'Cập nhật lúc'}: ${updatedAtText}` : null}
               {liveError ? <span className="liveInlineError"> · {liveError}</span> : null}
             </td>
           </tr>

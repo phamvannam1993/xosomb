@@ -2,6 +2,7 @@ import { buildVietlottRecentUrl, buildVietlottUrl } from './catalog';
 import { cleanHtmlText } from './format';
 import { normalizeVietlottText } from './normalize';
 import type { VietlottProductConfig, VietlottResult } from './types';
+import { fetchWithTimeout, numberFromEnv } from '@/lib/fetch-utils';
 
 function resultStartRegex(product: VietlottProductConfig) {
   const names = [product.shortName, product.name, ...product.aliases]
@@ -74,13 +75,14 @@ function sliceMainResult(text: string, product?: VietlottProductConfig) {
 
 export async function fetchVietlottFromHtml(product: VietlottProductConfig, date?: string): Promise<VietlottResult | null> {
   const url = buildVietlottUrl(product, date);
-  const response = await fetch(url, {
+  const timeoutMs = numberFromEnv(['VIETLOTT_HTML_TIMEOUT_MS', 'LOTTERY_HTML_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 6000);
+  const response = await fetchWithTimeout(url, {
     headers: {
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'xosomb.vn vietlott data fetcher/1.0'
     },
     next: { revalidate: Number(process.env.VIETLOTT_REVALIDATE_SECONDS || process.env.LOTTERY_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Không lấy được HTML ${product.shortName}: ${response.status}`);
@@ -98,13 +100,14 @@ export async function fetchVietlottFromHtml(product: VietlottProductConfig, date
 
 export async function fetchRecentVietlottFromHtml(product: VietlottProductConfig, limit = 30): Promise<VietlottResult[]> {
   const url = buildVietlottRecentUrl(product);
-  const response = await fetch(url, {
+  const timeoutMs = numberFromEnv(['VIETLOTT_HTML_TIMEOUT_MS', 'LOTTERY_HTML_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 6000);
+  const response = await fetchWithTimeout(url, {
     headers: {
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'xosomb.vn vietlott data fetcher/1.0'
     },
     next: { revalidate: Number(process.env.VIETLOTT_REVALIDATE_SECONDS || process.env.LOTTERY_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (!response.ok) return [];
   const text = cleanHtmlText(await response.text());

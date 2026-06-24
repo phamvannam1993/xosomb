@@ -5,6 +5,7 @@ import { fetchRecentVietlottFromHtml, fetchVietlottFromHtml } from './html';
 import { mockRecentVietlott, mockVietlottByDate, mockVietlottLatest } from './mock';
 import { isValidVietlottResult, normalizeVietlottApiResult } from './normalize';
 import type { VietlottProviderMode, VietlottResult } from './types';
+import { fetchWithTimeout, numberFromEnv } from '@/lib/fetch-utils';
 
 function providerMode(): VietlottProviderMode {
   const value = (process.env.VIETLOTT_PROVIDER || process.env.LOTTERY_PROVIDER || 'mock').toLowerCase();
@@ -33,13 +34,14 @@ async function fetchFromExternalApi(productId: string, date: string): Promise<Vi
   url.searchParams.set('product', product.id);
   url.searchParams.set('date', date);
 
-  const response = await fetch(url.toString(), {
+  const timeoutMs = numberFromEnv(['VIETLOTT_API_TIMEOUT_MS', 'LOTTERY_API_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 5000);
+  const response = await fetchWithTimeout(url.toString(), {
     headers: {
       Accept: 'application/json',
       ...(process.env.VIETLOTT_API_KEY ? { Authorization: `Bearer ${process.env.VIETLOTT_API_KEY}` } : {})
     },
     next: { revalidate: Number(process.env.VIETLOTT_REVALIDATE_SECONDS || process.env.LOTTERY_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Không lấy được Vietlott API: ${response.status}`);
@@ -56,13 +58,14 @@ async function fetchHistoryFromExternalApi(productId: string, limit = 30): Promi
   url.searchParams.set('product', product.id);
   url.searchParams.set('limit', String(limit));
 
-  const response = await fetch(url.toString(), {
+  const timeoutMs = numberFromEnv(['VIETLOTT_API_TIMEOUT_MS', 'LOTTERY_API_TIMEOUT_MS', 'LOTTERY_FETCH_TIMEOUT_MS'], 5000);
+  const response = await fetchWithTimeout(url.toString(), {
     headers: {
       Accept: 'application/json',
       ...(process.env.VIETLOTT_API_KEY ? { Authorization: `Bearer ${process.env.VIETLOTT_API_KEY}` } : {})
     },
     next: { revalidate: Number(process.env.VIETLOTT_REVALIDATE_SECONDS || process.env.LOTTERY_REVALIDATE_SECONDS || 60) }
-  });
+  }, timeoutMs);
 
   if (!response.ok) return [];
   const payload = await response.json();

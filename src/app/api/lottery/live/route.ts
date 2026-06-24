@@ -3,7 +3,9 @@ import { getLotterySource } from '@/lib/lottery/catalog';
 import { isFutureDate, isYyyyMmDd, todayInVietnam } from '@/lib/lottery/format';
 import { getLiveDrawWindow } from '@/lib/lottery/live';
 import { getLiveLotteryResult, getLotteryRuntimeConfig } from '@/lib/lottery/provider';
+import { mergeLiveLotteryResults } from '@/lib/lottery/live-state';
 import { fetchLiveFromXosoWebsite } from '@/lib/lottery/xoso-scraper';
+import type { LotteryLiveResult } from '@/lib/lottery/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -21,7 +23,8 @@ function json(data: unknown, init?: ResponseInit) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = (searchParams.get('code') || 'xsmb').toLowerCase();
-  const date = searchParams.get('date') || todayInVietnam();
+  const today = todayInVietnam();
+  const date = searchParams.get('date') || today;
   const source = getLotterySource(code);
 
   if (!source) {
@@ -37,27 +40,25 @@ export async function GET(request: NextRequest) {
   }
 
   const currentLiveWindow = getLiveDrawWindow(source);
-  const isToday = date === todayInVietnam();
-  const liveWindow =
-    isToday
-      ? currentLiveWindow
-      : {
-          ...currentLiveWindow,
-          date,
-          isLiveWindow: false,
-          shouldPoll: false
-        };
+  const isToday = date === today;
+  const liveWindow = isToday
+    ? currentLiveWindow
+    : {
+        ...currentLiveWindow,
+        date,
+        isLiveWindow: false,
+        shouldPoll: false
+      };
 
-  // Try fetch from xoso.com.vn for live data, fallback to mock/RSS/API
-  let result = null;
-  if (isToday && source.code === 'xsmb') {
-    result = await fetchLiveFromXosoWebsite(date).catch(() => null);
-  }
+  const candidates = await Promise.all<LotteryLiveResult | null>([
+    isToday && source.code === 'xsmb' ? fetchLiveFromXosoWebsite(date).catch(() => null) : Promise.resolve(null),
+    getLiveLotteryResult(source.code, date).catch(() => null)
+  ]);
 
-  // Fallback to provider (mock/RSS/API)
-  if (!result) {
-    result = await getLiveLotteryResult(source.code, date).catch(() => null);
-  }
+  const result = candidates.reduce<LotteryLiveResult | null>(
+    (best, candidate) => mergeLiveLotteryResults(best, candidate),
+    null
+  );
 
   return json({
     code: source.code,

@@ -1,7 +1,7 @@
 import type { LiveDrawWindow, LotteryLiveResult, LotteryResult, LotterySourceConfig } from './types';
 import { getPrizeSpecs } from './schemes';
 import { expectedCompletenessScore, isCompleteLotteryResult, lotteryCompletenessScore } from './normalize';
-import { todayInVietnam } from './format';
+import { todayInVietnam, getCurrentTimeInVietnam } from './format';
 
 const DEFAULT_DRAW_TIMES: Record<LotterySourceConfig['region'], string> = {
   north: '18:15',
@@ -119,8 +119,8 @@ export function createLivePlaceholderResult(source: LotterySourceConfig, date: s
     prizes: getPrizeSpecs(source.scheme).map((spec) => ({ label: spec.label, numbers: [] })),
     sourceName: source.rssTitle || source.name,
     sourceUrl: source.rssUrl,
-    updatedAt: new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: getCurrentTimeInVietnam(),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: 'cache'
   };
 }

@@ -1,6 +1,13 @@
 import type { LotteryLiveResult, LotteryResult, LotterySourceConfig, PrizeRow, PrizeSchemeId } from './types';
 import { getPrizeSpecs, getSpecialSpec } from './schemes';
-import { isFutureDate, isYyyyMmDd, normalizeDateFromPubDate, normalizeDateFromText } from './format';
+import {
+  getCurrentTimeInVietnam,
+  getReliableResultUpdatedAt,
+  isFutureDate,
+  isYyyyMmDd,
+  normalizeDateFromPubDate,
+  normalizeDateFromText
+} from './format';
 import { stripHtml } from './text';
 
 const LABEL_ALIASES: Record<string, string> = {
@@ -300,8 +307,8 @@ export function normalizeApiResult(value: unknown, source: LotterySourceConfig, 
     prizes,
     sourceName: payload.sourceName || sourceName,
     sourceUrl: payload.sourceUrl,
-    updatedAt: payload.updatedAt || new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: getReliableResultUpdatedAt(payload.updatedAt, date, source.region),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: 'api'
   };
 
@@ -332,8 +339,8 @@ export function normalizeResultFromText(
     prizes,
     sourceName: options.sourceName || 'XSKT',
     sourceUrl: options.sourceUrl,
-    updatedAt: options.updatedAt && !Number.isNaN(new Date(options.updatedAt).getTime()) ? new Date(options.updatedAt).toISOString() : new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: getReliableResultUpdatedAt(options.updatedAt, date, source.region),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: options.dataSource || 'html'
   };
 
@@ -372,9 +379,9 @@ export function normalizeLiveResultFromText(
     sourceUrl: options.sourceUrl,
     updatedAt:
       options.updatedAt && !Number.isNaN(new Date(options.updatedAt).getTime())
-        ? new Date(options.updatedAt).toISOString()
-        : new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+        ? options.updatedAt.includes('+') ? options.updatedAt : new Date(options.updatedAt).toISOString()
+        : getCurrentTimeInVietnam(),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: options.dataSource || 'rss',
     isComplete,
     status: isComplete ? 'complete' : 'running',
@@ -489,8 +496,8 @@ export function normalizeLiveApiResult(
     prizes,
     sourceName: typeof payload.sourceName === 'string' ? payload.sourceName : options.sourceName || 'API tường thuật xổ số',
     sourceUrl: typeof payload.sourceUrl === 'string' ? payload.sourceUrl : undefined,
-    updatedAt: typeof payload.updatedAt === 'string' ? payload.updatedAt : new Date().toISOString(),
-    fetchedAt: new Date().toISOString(),
+    updatedAt: typeof payload.updatedAt === 'string' ? payload.updatedAt : getCurrentTimeInVietnam(),
+    fetchedAt: getCurrentTimeInVietnam(),
     dataSource: 'live-api',
     isComplete,
     status: isComplete ? 'complete' : 'running',

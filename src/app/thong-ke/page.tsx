@@ -11,6 +11,9 @@ function BreadcrumbListSchema({ schema }: { schema: string }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schema }} />;
 }
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Thống kê XSMB tham khảo',
   description: 'Thống kê tần suất 2 số cuối từ dữ liệu kết quả xổ số miền Bắc gần đây. Chỉ dùng để tham khảo dữ liệu.',

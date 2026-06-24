@@ -92,18 +92,28 @@ const navLinks = [
     ]
   },
   {
-    label: 'Sổ kết quả',
+    label: 'Sổ KQ',
     href: '/xsmb-30-ngay',
     children: [
       { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
-      { label: 'Dò vé số online', href: '/do-ve-so' },
-      { label: 'In vé dò', href: '/in-ve-do' },
       { label: 'XSMB hôm nay', href: '/xsmb' },
+      { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
       { label: 'Thống kê tham khảo', href: '/thong-ke' }
     ]
   },
   { label: 'Dò vé', href: '/do-ve-so' },
-  { label: 'In vé dò', href: '/in-ve-do' },
+  {
+    label: 'Tiện ích',
+    href: '/in-ve-do',
+    children: [
+      { label: 'In vé dò', href: '/in-ve-do' },
+      { label: 'Dò vé số online', href: '/do-ve-so' },
+      { label: 'Thống kê tham khảo', href: '/thong-ke' },
+      { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
+      { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
+      { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
+    ]
+  },
   {
     label: 'Thông tin',
     href: '/gioi-thieu',
@@ -114,18 +124,7 @@ const navLinks = [
       { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' },
       { label: 'Liên hệ', href: '/lien-he' }
     ]
-  },
-  {
-    label: 'Quay thử',
-    href: '/quay-thu-xsmb',
-    children: [
-      { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
-      { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
-      { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
-    ]
-  },
-  { label: 'Thống kê', href: '/thong-ke' },
-  { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' }
+  }
 ];
 
 const footerColumns = [

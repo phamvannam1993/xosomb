@@ -1,26 +1,77 @@
-import type { LotteryResult } from './types';
+import type { LotteryLiveResult, PrizeRow } from './types';
+import { getLotterySource } from './catalog';
+import { getCurrentTimeInVietnam } from './format';
+import { expectedCompletenessScore, lotteryRowsCompletenessScore } from './normalize';
+import { getPrizeSpecs, getSpecialSpec } from './schemes';
+import { stripHtml } from './text';
 
-// Simple cache untuk mengurangi fetch frequency
-let cachedResult: LotteryResult | null = null;
+// Cache rất ngắn để tránh nhiều client live cùng lúc đánh liên tục vào nguồn ngoài.
+let cachedResult: LotteryLiveResult | null = null;
 let cachedTime = 0;
-const CACHE_DURATION = 5000; // 5 seconds cache
+const CACHE_DURATION = 2_000;
 
-export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryResult | null> {
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function cleanNumber(value: string, expectedLength: number) {
+  const digits = stripHtml(value).replace(/\D/g, '');
+  return digits.length === expectedLength ? digits : null;
+}
+
+function extractById(html: string, id: string) {
+  const regex = new RegExp(`id=["']?${escapeRegExp(id)}["']?[^>]*>([\\s\\S]*?)<`, 'i');
+  return regex.exec(html)?.[1] || '';
+}
+
+function extractNumbers(html: string, idPrefix: string, expectedLength: number, maxCount: number) {
+  const numbers: string[] = [];
+
+  for (let index = 0; index < maxCount; index += 1) {
+    const value = cleanNumber(extractById(html, `${idPrefix}${index}`), expectedLength);
+    if (value) numbers.push(value);
+  }
+
+  return numbers;
+}
+
+function buildXsmbRows(html: string): PrizeRow[] {
+  const prefixByLabel: Record<string, string> = {
+    'Đặc biệt': 'mb_prizeDB_item',
+    'Giải nhất': 'mb_prize1_item',
+    'Giải nhì': 'mb_prize2_item',
+    'Giải ba': 'mb_prize3_item',
+    'Giải tư': 'mb_prize4_item',
+    'Giải năm': 'mb_prize5_item',
+    'Giải sáu': 'mb_prize6_item',
+    'Giải bảy': 'mb_prize7_item'
+  };
+
+  return getPrizeSpecs('north')
+    .map((spec) => ({
+      label: spec.label,
+      numbers: extractNumbers(html, prefixByLabel[spec.label], spec.length, spec.count).slice(0, spec.count)
+    }))
+    .filter((row) => row.numbers.length > 0);
+}
+
+export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryLiveResult | null> {
+  const source = getLotterySource('xsmb');
+  if (!source) return null;
+
+  if (cachedResult?.date === date && Date.now() - cachedTime < CACHE_DURATION) {
+    return cachedResult;
+  }
+
+  const url = 'https://xoso.com.vn/';
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5_000);
+
   try {
-    // Return cached result jika masih fresh
-    if (cachedResult && Date.now() - cachedTime < CACHE_DURATION) {
-      return cachedResult;
-    }
-
-    // Fetch homepage which contains today's lottery results
-    const url = 'https://xoso.com.vn/';
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
-
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html'
+        'User-Agent': 'Mozilla/5.0 (compatible; xosomb.vn live fetcher/1.1)',
+        Accept: 'text/html,application/xhtml+xml'
       },
       cache: 'no-store',
       signal: controller.signal
@@ -29,61 +80,43 @@ export async function fetchLiveFromXosoWebsite(date: string): Promise<LotteryRes
     if (!response.ok) return null;
 
     const html = await response.text();
+    const prizes = buildXsmbRows(html);
+    const completenessScore = lotteryRowsCompletenessScore(prizes, 'north');
+    if (!completenessScore) return null;
 
-    // Parse HTML to extract prize data using IDs from xoso.com.vn structure
-    const specialMatch = html.match(/id=mb_prizeDB_item0[^>]*>([^<]+)</);
-    const prize1Match = html.match(/id=mb_prize1_item0[^>]*>([^<]+)</);
-    const prize2Matches = html.match(/id=mb_prize2_item\d+[^>]*>([^<]+)</g) || [];
-    const prize3Matches = html.match(/id=mb_prize3_item\d+[^>]*>([^<]+)</g) || [];
-    const prize4Matches = html.match(/id=mb_prize4_item\d+[^>]*>([^<]+)</g) || [];
-    const prize5Matches = html.match(/id=mb_prize5_item\d+[^>]*>([^<]+)</g) || [];
-    const prize6Matches = html.match(/id=mb_prize6_item\d+[^>]*>([^<]+)</g) || [];
-    const prize7Matches = html.match(/id=mb_prize7_item\d+[^>]*>([^<]+)</g) || [];
+    const expectedScore = expectedCompletenessScore('north');
+    const specialLabel = getSpecialSpec('north').label;
+    const specialPrize = prizes.find((row) => row.label === specialLabel)?.numbers[0];
+    const isComplete = Boolean(specialPrize) && completenessScore === expectedScore;
+    const now = getCurrentTimeInVietnam();
 
-    const extractNumbers = (matches: string[]): string[] => {
-      return matches.map(m => {
-        const numMatch = m.match(/>([^<]+)</);
-        return numMatch ? numMatch[1].trim() : '';
-      }).filter(Boolean);
-    };
-
-    const specialPrize = specialMatch ? specialMatch[1].trim() : '';
-
-    // If no data found, return null
-    if (!specialPrize) return null;
-
-    const result: LotteryResult = {
+    const result: LotteryLiveResult = {
       date,
-      code: 'xsmb',
-      region: 'north',
-      province: 'Miền Bắc',
-      shortName: 'XSMB',
-      scheme: 'north',
+      code: source.code,
+      region: source.region,
+      province: source.name.replace(/^Xổ số\s+/i, ''),
+      shortName: source.shortName,
+      scheme: source.scheme,
       specialPrize,
-      prizes: [
-        { label: 'Đặc biệt', numbers: specialPrize ? [specialPrize] : [] },
-        { label: 'Giải nhất', numbers: prize1Match ? [prize1Match[1].trim()] : [] },
-        { label: 'Giải nhì', numbers: extractNumbers(prize2Matches) },
-        { label: 'Giải ba', numbers: extractNumbers(prize3Matches) },
-        { label: 'Giải tư', numbers: extractNumbers(prize4Matches) },
-        { label: 'Giải năm', numbers: extractNumbers(prize5Matches) },
-        { label: 'Giải sáu', numbers: extractNumbers(prize6Matches) },
-        { label: 'Giải bảy', numbers: extractNumbers(prize7Matches) }
-      ],
+      prizes,
       sourceName: 'XoSo.com.vn Live',
       sourceUrl: url,
-      updatedAt: new Date().toISOString(),
-      fetchedAt: new Date().toISOString(),
-      dataSource: 'html'
+      updatedAt: now,
+      fetchedAt: now,
+      dataSource: 'html',
+      isComplete,
+      status: isComplete ? 'complete' : 'running',
+      completenessScore,
+      expectedScore
     };
 
-    // Cache result
     cachedResult = result;
     cachedTime = Date.now();
 
     return result;
-  } catch (error) {
-    console.error('Error fetching from xoso.com.vn:', error);
+  } catch {
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
