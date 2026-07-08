@@ -136,3 +136,50 @@ Kết quả đầy đủ ngày 23/06/2026 · Cập nhật lúc: 18:45:00 23/06/2
 - Giảm chiều cao thanh menu, giảm padding/font dropdown để hiển thị gọn hơn.
 - Thu gọn sidebar trái/phải từ 260px xuống 215px, giảm khoảng cách và padding các dòng link.
 - Tăng container chính lên 1180px để khu vực kết quả ở giữa rộng hơn.
+
+## Cập nhật UI sidebar kiểu xổ số truyền thống
+
+Bản này đã tinh chỉnh sidebar trái/phải theo mẫu box xổ số truyền thống:
+
+- Header sidebar nền đỏ, chữ trắng in hoa, có icon tròn vàng.
+- Danh sách link nền trắng, link xanh, bullet vuông đỏ nhỏ.
+- Dòng link gọn hơn, border dotted mảnh như mẫu tham chiếu.
+- Sidebar trái gom đúng nhóm: Xổ số miền Bắc, Xổ số miền Nam, Xổ số miền Trung.
+- Sidebar phải gom nhóm: Tiện ích thống kê, Xổ số Vietlott, Công cụ xổ số, Thông tin website.
+- Bố cục 3 cột tối ưu lại: trái 205px, phải 250px, giữa giữ rộng cho bảng kết quả.
+
+Các file đã chỉnh chính:
+
+- `src/components/LotteryShell.tsx`
+- `src/app/globals.css`
+
+## Cập nhật trang thống kê tần suất lô tô miền Bắc
+
+Bản này đã thêm trang:
+
+```txt
+/thong-ke-tan-suat-lo-to-mien-bac.html
+```
+
+Chức năng:
+
+- Giao diện form theo kiểu bảng thống kê truyền thống: chọn tỉnh, số ngày, loại thống kê, bộ số 00-99.
+- Chọn nhanh: tất cả, xóa tất cả, số chẵn, số lẻ, đầu 0-9, đuôi 0-9.
+- Bảng kết quả có 2 chế độ xem: chiều dọc và chiều ngang.
+- Ô màu đỏ thể hiện bộ số về ở giải đặc biệt.
+- Trang có canonical, sitemap và liên kết từ menu/sidebar/footer.
+- Mặc định server đọc HTML thống kê từ `https://az24.vn/thong-ke-tan-suat-lo-to-mien-bac.html` để dựng bảng tần suất; nếu nguồn này lỗi hoặc timeout, hệ thống tự fallback về dữ liệu kết quả nội bộ.
+
+Biến môi trường tùy chọn:
+
+```env
+AZ24_FREQUENCY_ENABLED=true
+AZ24_FREQUENCY_TIMEOUT_MS=8000
+AZ24_FREQUENCY_REVALIDATE_SECONDS=300
+```
+
+Nếu muốn tắt đọc HTML ngoài và chỉ dùng dữ liệu nội bộ:
+
+```env
+AZ24_FREQUENCY_ENABLED=false
+```

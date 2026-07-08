@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry('/mien-tru-trach-nhiem', today, 0.5, 'monthly'),
     entry('/lien-he', today, 0.5, 'monthly'),
     entry('/thong-ke', today, 0.7, 'daily'),
+    entry('/thong-ke-tan-suat-lo-to-mien-bac.html', today, 0.8, 'daily'),
     entry('/lich-mo-thuong', today, 0.6, 'weekly'),
     entry('/vietlott', today, 0.8, 'daily')
   ];

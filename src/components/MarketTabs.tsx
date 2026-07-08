@@ -15,7 +15,7 @@ export function MarketTabs() {
         <Link href="/lich-mo-thuong">Lịch mở thưởng</Link>
         <Link href="/vietlott/mega-645">Mega 6/45</Link>
         <Link href="/vietlott/power-655">Power 6/55</Link>
-        <Link href="/thong-ke">Thống kê tham khảo</Link>
+        <Link href="/thong-ke-tan-suat-lo-to-mien-bac.html">Tần suất lô tô</Link>
       </div>
     </section>
   );

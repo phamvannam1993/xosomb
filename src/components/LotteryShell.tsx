@@ -2,32 +2,38 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { getSourcesByRegion } from '@/lib/lottery/catalog';
 
-const dataUtilities = [
-  { label: 'XSMB hôm nay', href: '/xsmb' },
-  { label: 'XSMB 30 ngày', href: '/xsmb-30-ngay' },
+const statsUtilities = [
+  { label: 'Thống kê 2 số cuối giải ĐB', href: '/thong-ke' },
+  { label: 'Thống kê lô tô gan MB', href: '/thong-ke' },
+  { label: 'Thống kê đầu đuôi lô tô miền Bắc', href: '/xsmb-30-ngay' },
+  { label: 'Thống kê tần suất lô tô miền Bắc', href: '/thong-ke-tan-suat-lo-to-mien-bac.html' },
+  { label: 'Cách dùng mã nhúng hiển thị kết quả xổ số', href: '/nguon-du-lieu' }
+];
+
+const vietlottLinks = [
+  { label: 'Vietlott', href: '/vietlott' },
+  { label: 'Mega 645', href: '/vietlott/mega-645' },
+  { label: 'Power 655', href: '/vietlott/power-655' },
+  { label: 'Max 3D', href: '/vietlott/max-3d' },
+  { label: 'Max 3D Pro', href: '/vietlott/max-3d-pro' },
+  { label: 'Keno', href: '/vietlott' }
+];
+
+const quickTools = [
   { label: 'Dò vé số online', href: '/do-ve-so' },
   { label: 'In vé dò', href: '/in-ve-do' },
-  { label: 'Thống kê tham khảo', href: '/thong-ke' },
   { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
-  { label: 'Kết quả Vietlott', href: '/vietlott' },
-  { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
+  { label: 'Quay thử XSMB', href: '/quay-thu-xsmb', rel: 'nofollow' },
+  { label: 'Quay thử XSMN', href: '/quay-thu-xsmn', rel: 'nofollow' },
+  { label: 'Quay thử XSMT', href: '/quay-thu-xsmt', rel: 'nofollow' }
+];
+
+const infoLinks = [
+  { label: 'Giới thiệu XoSoMB.vn', href: '/gioi-thieu' },
+  { label: 'Nguồn dữ liệu xổ số', href: '/nguon-du-lieu' },
+  { label: 'Chính sách cập nhật kết quả', href: '/chinh-sach-cap-nhat-ket-qua' },
+  { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' },
   { label: 'Liên hệ', href: '/lien-he' }
-];
-
-const guideLinks = [
-  { label: 'Cách đọc bảng kết quả', href: '/xsmb' },
-  { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' },
-  { label: 'Dò vé số online', href: '/do-ve-so' },
-  { label: 'In phiếu dò kết quả', href: '/in-ve-do' },
-  { label: 'Lịch quay các miền', href: '/lich-mo-thuong' },
-  { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
-  { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' }
-];
-
-const quayThuLinks = [
-  { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
-  { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
-  { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
 ];
 
 function SidebarSection({ title, href, children }: { title: string; href?: string; children: ReactNode }) {
@@ -44,8 +50,17 @@ function SidebarSection({ title, href, children }: { title: string; href?: strin
 function ListLink({ href, label, badge, rel }: { href: string; label: string; badge?: string; rel?: string }) {
   return (
     <Link className="sideLink" href={href} rel={rel}>
-      <span>{label}</span>
-      {badge ? <em>{badge}</em> : null}
+      <span className="sideLinkText">
+        <span className="sideBullet" aria-hidden="true" />
+        <span>{label}</span>
+      </span>
+      {badge ? (
+        <span className="sideDots" aria-label={badge}>
+          <i className="is-active" />
+          <i />
+          <i />
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -57,27 +72,30 @@ function LeftSidebar() {
   return (
     <aside className="leftColumn" aria-label="Danh mục xổ số">
       <SidebarSection title="Xổ số miền Bắc" href="/xsmb">
-        <ListLink href="/xsmb" label="Miền Bắc" badge="live" />
+        <ListLink href="/xsmb" label="Miền Bắc" badge="Đang cập nhật" />
         <ListLink href="/xsmb-30-ngay" label="XSMB 30 ngày" />
         <ListLink href="/lich-mo-thuong" label="Lịch mở thưởng" />
       </SidebarSection>
 
-      <SidebarSection title="Vietlott" href="/vietlott">
-        <ListLink href="/vietlott/mega-645" label="Mega 6/45" />
-        <ListLink href="/vietlott/power-655" label="Power 6/55" />
-        <ListLink href="/vietlott/max-3d" label="Max 3D" />
-        <ListLink href="/vietlott/max-3d-pro" label="Max 3D Pro" />
-      </SidebarSection>
-
       <SidebarSection title="Xổ số miền Nam" href="/xsmn">
-        {south.slice(0, 20).map((province) => (
-          <ListLink key={province.code} href={`/${province.code}`} label={province.name.replace(/^Xổ số\s+/i, '')} />
+        {south.map((province, index) => (
+          <ListLink
+            key={province.code}
+            href={`/${province.code}`}
+            label={province.name.replace(/^Xổ số\s+/i, '')}
+            badge={index < 3 ? 'Đang cập nhật' : undefined}
+          />
         ))}
       </SidebarSection>
 
       <SidebarSection title="Xổ số miền Trung" href="/xsmt">
-        {central.slice(0, 16).map((province) => (
-          <ListLink key={province.code} href={`/${province.code}`} label={province.name.replace(/^Xổ số\s+/i, '')} />
+        {central.map((province, index) => (
+          <ListLink
+            key={province.code}
+            href={`/${province.code}`}
+            label={province.name.replace(/^Xổ số\s+/i, '')}
+            badge={index < 3 ? 'Đang cập nhật' : undefined}
+          />
         ))}
       </SidebarSection>
     </aside>
@@ -87,39 +105,29 @@ function LeftSidebar() {
 function RightSidebar() {
   return (
     <aside className="rightColumn" aria-label="Tiện ích tra cứu">
-      <SidebarSection title="Xổ số hôm qua" href="/xsmb-30-ngay">
-        <ListLink href="/xsmb-30-ngay" label="XSMB hôm qua" />
-        <ListLink href="/xsmn" label="XSMN gần đây" />
-        <ListLink href="/xsmt" label="XSMT gần đây" />
+      <SidebarSection title="Xem thêm tiện ích thống kê" href="/thong-ke">
+        {statsUtilities.map((item) => (
+          <ListLink key={`${item.href}-${item.label}`} href={item.href} label={item.label} />
+        ))}
       </SidebarSection>
 
-      <SidebarSection title="Công cụ tra cứu">
-        {dataUtilities.map((item) => (
+      <SidebarSection title="Xổ số Vietlott" href="/vietlott">
+        {vietlottLinks.map((item) => (
           <ListLink key={item.label} href={item.href} label={item.label} />
         ))}
       </SidebarSection>
 
-      <SidebarSection title="Quay thử xổ số" href="/quay-thu-xsmb">
-        {quayThuLinks.map((item) => (
-          <ListLink key={item.label} href={item.href} label={item.label} rel="nofollow" />
-        ))}
-      </SidebarSection>
-
-      <SidebarSection title="Hướng dẫn nhanh">
-        {guideLinks.map((item) => (
-          <ListLink key={item.label} href={item.href} label={item.label} />
+      <SidebarSection title="Công cụ xổ số">
+        {quickTools.map((item) => (
+          <ListLink key={item.label} href={item.href} label={item.label} rel={item.rel} />
         ))}
       </SidebarSection>
 
       <SidebarSection title="Thông tin website" href="/gioi-thieu">
-        <ListLink href="/gioi-thieu" label="Giới thiệu" />
-        <ListLink href="/chinh-sach-cap-nhat-ket-qua" label="Chính sách cập nhật" />
-        <ListLink href="/lien-he" label="Liên hệ" />
+        {infoLinks.map((item) => (
+          <ListLink key={item.label} href={item.href} label={item.label} />
+        ))}
       </SidebarSection>
-
-      <section className="scheduleCard">
-        <Link href="/lich-mo-thuong">Xem lịch mở thưởng</Link>
-      </section>
     </aside>
   );
 }

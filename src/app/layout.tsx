@@ -98,7 +98,7 @@ const navLinks = [
       { label: 'Sổ kết quả 30 ngày', href: '/xsmb-30-ngay' },
       { label: 'XSMB hôm nay', href: '/xsmb' },
       { label: 'Lịch mở thưởng', href: '/lich-mo-thuong' },
-      { label: 'Thống kê tham khảo', href: '/thong-ke' }
+      { label: 'Thống kê tần suất', href: '/thong-ke-tan-suat-lo-to-mien-bac.html' }
     ]
   },
   { label: 'Dò vé', href: '/do-ve-so' },
@@ -108,7 +108,7 @@ const navLinks = [
     children: [
       { label: 'In vé dò', href: '/in-ve-do' },
       { label: 'Dò vé số online', href: '/do-ve-so' },
-      { label: 'Thống kê tham khảo', href: '/thong-ke' },
+      { label: 'Thống kê tần suất', href: '/thong-ke-tan-suat-lo-to-mien-bac.html' },
       { label: 'Quay thử XSMB', href: '/quay-thu-xsmb' },
       { label: 'Quay thử XSMN', href: '/quay-thu-xsmn' },
       { label: 'Quay thử XSMT', href: '/quay-thu-xsmt' }
@@ -158,7 +158,7 @@ const footerColumns = [
       { label: 'In vé dò', href: '/in-ve-do' },
       { label: 'Nguồn dữ liệu', href: '/nguon-du-lieu' },
       { label: 'Chính sách cập nhật', href: '/chinh-sach-cap-nhat-ket-qua' },
-      { label: 'Bảng lô tô 2 số cuối', href: '/thong-ke' },
+      { label: 'Bảng tần suất lô tô', href: '/thong-ke-tan-suat-lo-to-mien-bac.html' },
       { label: 'Tra cứu theo ngày', href: '/xsmb-30-ngay' }
     ]
   },
@@ -170,7 +170,7 @@ const footerColumns = [
       { label: 'Chính sách cập nhật', href: '/chinh-sach-cap-nhat-ket-qua' },
       { label: 'Miễn trừ trách nhiệm', href: '/mien-tru-trach-nhiem' },
       { label: 'Liên hệ', href: '/lien-he' },
-      { label: 'Thống kê tham khảo', href: '/thong-ke' }
+      { label: 'Thống kê tần suất', href: '/thong-ke-tan-suat-lo-to-mien-bac.html' }
     ]
   }
 ];

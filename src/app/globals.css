@@ -297,15 +297,15 @@ input {
 
 .layoutGrid {
   display: grid;
-  grid-template-columns: 215px minmax(0, 1fr) 215px;
-  gap: 12px;
+  grid-template-columns: 205px minmax(0, 1fr) 250px;
+  gap: 10px;
   align-items: start;
 }
 
 .leftColumn,
 .rightColumn {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .centerColumn {
@@ -314,13 +314,145 @@ input {
   gap: 12px;
 }
 
-.sidebarSection,
 .contentPanel,
 .searchPanel,
 .seoLead,
 .resultBoard,
 .marketTabs,
 .noticeBox,
+.scheduleCard {
+  overflow: hidden;
+  border: 1px solid #ecd7bf;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.sidebarSection {
+  overflow: hidden;
+  border: 1px solid #dddddd;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.nav-group-title {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 0 10px;
+  color: #fff;
+  background: #ed1c24;
+  border-bottom: 1px solid #d80f18;
+  font-size: 0.93rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.nav-group-title::before {
+  display: inline-grid;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: #ffeb71;
+  background: radial-gradient(circle at 35% 35%, #fff176 0 18%, #ffc928 19% 55%, #ff9e12 56% 100%);
+  border: 2px solid #ffcf29;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.22);
+  content: '›';
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.nav-group-title a,
+.nav-group-title span {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-group-title a:hover {
+  color: #fffbe0;
+}
+
+.sidebarBody {
+  display: grid;
+  background: #fff;
+}
+
+.sideLink {
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 5px 9px;
+  color: #0000ee;
+  border-bottom: 1px dotted #e0e0e0;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.sideLink:hover,
+.sideLink:focus {
+  color: #d71920;
+  background: #fff9e8;
+}
+
+.sideLink:last-child {
+  border-bottom: 0;
+}
+
+.sideLinkText {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+}
+
+.sideLinkText span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sideBullet {
+  flex: 0 0 5px;
+  width: 5px;
+  height: 5px;
+  background: #ed1c24;
+}
+
+.sideDots {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.sideDots i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: #b8b8b8;
+  border-radius: 999px;
+}
+
+.sideDots i.is-active {
+  background: #111;
+}
+
 .scheduleCard {
   overflow: hidden;
   border: 1px solid #ecd7bf;
@@ -2938,5 +3070,902 @@ input[type='date'] {
   .contactGrid,
   .trustLinkGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Thống kê tần suất lô tô kiểu bảng AZ24, dựng lại bằng component nội bộ.
+   Toàn bộ selector được scope trong .frequencyPage để tránh đè CSS của các trang khác. */
+.frequencyPage {
+  display: grid;
+  max-width: 100%;
+  min-width: 0;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.frequencyPage *,
+.frequencyPage *::before,
+.frequencyPage *::after {
+  box-sizing: border-box;
+}
+
+.frequencyPage button,
+.frequencyPage select,
+.frequencyPage input {
+  font: inherit;
+}
+
+.frequencyPage .azLikeBox {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.frequencyPage .title-bor {
+  margin: 0;
+  padding: 9px 11px;
+  color: #222;
+  background: #fff;
+  border-bottom: 1px solid #d7d7d7;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.frequencyPage .frequencyForm {
+  display: grid;
+  gap: 0;
+}
+
+.frequencyPage .statistic-menu {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 7px;
+  align-items: end;
+  padding: 9px;
+  background: #fffaf0;
+  border-bottom: 1px solid #ead9c6;
+}
+
+.frequencyPage .frequencyField {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  color: #222;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.frequencyPage .frequencyField span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.frequencyPage .frequencyField select {
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px 7px;
+  color: #222;
+  background: #fff;
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.frequencyPage .frequencyField select:focus {
+  border-color: #f26b00;
+  box-shadow: 0 0 0 2px rgba(242, 107, 0, 0.14);
+}
+
+.frequencyPage .frequencySubmit {
+  min-height: 32px;
+  padding: 0 14px;
+  color: #fff;
+  background: #f26b00;
+  border: 1px solid #d65d00;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.frequencyPage .frequencySubmit:hover {
+  background: #e11d24;
+}
+
+.frequencyPage .provinceQuickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+  padding: 6px 10px 8px;
+  color: #5f6368;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.frequencyPage .provinceQuickLinks a {
+  color: #004de6;
+  text-decoration: underline;
+}
+
+.frequencyPage .freq-stat-num {
+  min-width: 0;
+  border-top: 1px solid #f0d8b8;
+}
+
+.frequencyPage .radio-button-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  background: #ff7900;
+}
+
+.frequencyPage .radio-button-menu button {
+  min-height: 28px;
+  padding: 3px 9px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.frequencyPage .radio-button-menu button:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.frequencyPage .checkedStatus {
+  margin-left: auto;
+  color: #fffbe9;
+  font-size: 0.84rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.frequencyPage .numberMatrix {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 5px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.frequencyPage .numberMatrixRow {
+  display: grid;
+  width: max-content;
+  min-width: 100%;
+  grid-template-columns: repeat(10, 44px) 68px;
+  border-top: 1px solid #eeeeee;
+}
+
+.frequencyPage .numberMatrixRow:first-child {
+  border-top: 0;
+}
+
+.frequencyPage .number-checkbox {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 4px;
+  color: #111;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.frequencyPage .number-checkbox input {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: #ed1c24;
+}
+
+.frequencyPage .btn-white-round {
+  min-width: 0;
+  margin: 2px;
+  padding: 3px 6px;
+  color: #d71920;
+  background: #fff;
+  border: 1px solid #d5d5d5;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.frequencyPage .btn-white-round:hover {
+  color: #fff;
+  background: #ed1c24;
+  border-color: #ed1c24;
+}
+
+.frequencyPage .tailRow {
+  grid-template-columns: repeat(10, 58px) 68px;
+  background: #fff6c9;
+}
+
+.frequencyPage .tailSpacer {
+  display: block;
+}
+
+.frequencyPage .frequencyGuide,
+.frequencyPage .frequencyNote {
+  margin: 0;
+  padding: 8px 10px;
+  color: #444;
+  background: #fff;
+  border-top: 1px solid #eeeeee;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.frequencyPage .frequencyGuide strong {
+  color: #d71920;
+}
+
+.frequencyPage .tit-mien {
+  margin: 0;
+  padding: 9px 10px;
+  color: #fff;
+  background: #ff6500;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.frequencyPage .tansuat-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 9px;
+  color: #222;
+  background: #fff;
+  border-bottom: 1px solid #e2e2e2;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.frequencyPage .tansuat-selection label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.frequencyPage .tansuat-selection input[type='radio'] {
+  margin: 0;
+  accent-color: #ed1c24;
+}
+
+.frequencyPage .frequencySource {
+  margin-left: auto;
+  color: #667085;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.frequencyPage .freq-loto-table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.frequencyPage .frequencyMatrixTable {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.78rem;
+}
+
+.frequencyPage .frequencyMatrixTable th,
+.frequencyPage .frequencyMatrixTable td {
+  width: 32px;
+  min-width: 32px;
+  height: 28px;
+  padding: 2px 4px;
+  border: 1px solid #d7d7d7;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.12;
+}
+
+.frequencyPage .frequencyMatrixTable th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: #111;
+  background: #fff6c9;
+  font-weight: 900;
+}
+
+.frequencyPage .frequencyMatrixTable .info,
+.frequencyPage .frequencyMatrixTable th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 48px;
+  min-width: 48px;
+  color: #111;
+  background: #f6f6f6;
+  font-weight: 900;
+}
+
+.frequencyPage .frequencyMatrixTable thead .info,
+.frequencyPage .frequencyMatrixTable thead th:first-child {
+  z-index: 3;
+  background: #fff6c9;
+}
+
+.frequencyPage .frequencyMatrixTable th:last-child,
+.frequencyPage .frequencyMatrixTable td:last-child,
+.frequencyPage .frequencyMatrixTable .bg_note {
+  width: 42px;
+  min-width: 42px;
+}
+
+.frequencyPage .freqCell {
+  color: #111;
+  background: #fff;
+  font-weight: 800;
+}
+
+.frequencyPage .freqCell.hasCount {
+  background: #fffdf5;
+}
+
+.frequencyPage .freqCell.isSpecial {
+  color: #ed1c24;
+  background: #fff0f0;
+  font-weight: 950;
+}
+
+.frequencyPage .bg_note {
+  color: #111;
+  background: #fff6c9;
+  font-weight: 950;
+}
+
+.frequencyPage .frequencyMatrixTableHorizontal {
+  min-width: 980px;
+}
+
+.frequencyPage .frequencyMatrixTableHorizontal .dateInfo {
+  width: 86px;
+  min-width: 86px;
+  white-space: nowrap;
+}
+
+.frequencySeoText {
+  padding: 14px 16px;
+}
+
+.frequencySeoText h2 {
+  margin: 0 0 8px;
+  color: var(--brand-dark);
+  font-size: 1.2rem;
+}
+
+.frequencySeoText p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+@media (max-width: 760px) {
+  .frequencyPage .statistic-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .frequencyPage .frequencySubmit {
+    width: 100%;
+  }
+
+  .frequencyPage .checkedStatus,
+  .frequencyPage .frequencySource {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .frequencyPage .numberMatrixRow {
+    grid-template-columns: repeat(10, 42px) 64px;
+  }
+
+  .frequencyPage .tailRow {
+    grid-template-columns: repeat(10, 54px) 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .frequencyPage .title-bor,
+  .frequencyPage .tit-mien {
+    font-size: 0.95rem;
+  }
+
+  .frequencyPage .radio-button-menu {
+    gap: 5px;
+  }
+
+  .frequencyPage .radio-button-menu button {
+    padding: 3px 7px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Bổ sung style cho các màn cũ để tránh rơi về text trần sau khi thêm trang tần suất */
+.introCard,
+.recentBox {
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid #ecd7bf;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.introCard h1,
+.recentBox h2 {
+  margin: 0 0 8px;
+  color: var(--brand-dark);
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  line-height: 1.25;
+}
+
+.introCard p,
+.mutedText {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.searchPanel .mutedText {
+  margin-top: 10px;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.quickCard {
+  display: grid;
+  gap: 5px;
+  min-height: 96px;
+  align-content: start;
+  padding: 14px;
+  color: var(--text);
+  border: 1px solid #ecd7bf;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #fffaf2, #fff);
+  box-shadow: var(--shadow);
+}
+
+.quickCard:hover {
+  color: var(--brand-dark);
+  border-color: #f2b96c;
+  background: #fff7e8;
+}
+
+.quickCard strong {
+  color: var(--brand);
+  font-size: 1.05rem;
+}
+
+.quickCard span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.recentGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.recentBox .recentItem,
+.recentGrid .recentItem {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.recentGrid .recentItem strong {
+  color: var(--brand);
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.recentGrid .recentItem span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.recentGrid .recentItem em {
+  color: #111827;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.ticketAlert.error {
+  border-color: #ffd4d4;
+  color: #8f0f14;
+  background: #fff2f2;
+}
+
+.printLotoCompact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 10px;
+  margin-top: 8px;
+}
+
+.printLotoCompact p {
+  margin: 0;
+  padding: 4px 6px;
+  border: 1px solid #aeb6c2;
+}
+
+.frequencyPage .frequencyFilterBox,
+.frequencyPage .tk-tansuat {
+  min-width: 0;
+}
+
+@media (max-width: 620px) {
+  .quickGrid,
+  .printLotoCompact {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Full 30-day result book page */
+.bookAnnouncement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  color: #1f2933;
+  background: #fff9df;
+  border: 1px solid #e8d8ab;
+  border-radius: 2px;
+  font-size: 0.96rem;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.bookAnnouncement a {
+  color: #ed1c24;
+  font-weight: 900;
+}
+
+.bookTabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 2px;
+  list-style: none;
+}
+
+.bookTabs li {
+  border-right: 1px solid #e1e1e1;
+}
+
+.bookTabs li:last-child {
+  border-right: 0;
+}
+
+.bookTabs a {
+  display: block;
+  padding: 10px 8px;
+  color: #111;
+  font-weight: 700;
+  text-align: center;
+}
+
+.bookTabs li.active a,
+.bookTabs a:hover {
+  color: #fff;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+
+.bookControl,
+.bookResultItem,
+.bookSeeMore,
+.bookStatsBox {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #ecd7bf;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.bookBoxTitle {
+  margin: 0;
+  padding: 9px 12px;
+  color: var(--brand-dark);
+  background: #fff;
+  border-bottom: 1px solid #ecd7bf;
+  font-size: 1.04rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.bookFilterForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 10px 12px;
+}
+
+.bookFilterGroup {
+  display: grid;
+  gap: 5px;
+}
+
+.bookFilterLabel {
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.bookSelect {
+  min-height: 34px;
+  width: min(100%, 240px);
+  padding: 5px 9px;
+  color: #222;
+  background: #fff;
+  border: 1px solid #cfcfcf;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.bookSubmitButton {
+  min-height: 34px;
+  padding: 0 15px;
+  color: #fff;
+  background: #ed1c24;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.bookSubmitButton:hover {
+  background: var(--brand-dark);
+}
+
+.bookMoreDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 0;
+  align-items: center;
+  padding: 8px 10px;
+  background: #fffdf4;
+  border-top: 1px solid #efe4ca;
+  color: #555;
+  font-size: 0.88rem;
+}
+
+.bookMoreDays span {
+  margin-right: 4px;
+  color: #a00000;
+  font-weight: 800;
+}
+
+.bookMoreDays a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 6px;
+  color: #004cff;
+  border-right: 1px solid #b8b8b8;
+  font-weight: 700;
+}
+
+.bookMoreDays a:last-child {
+  border-right: 0;
+}
+
+.bookMoreDays a.active,
+.bookMoreDays a:hover {
+  color: #ed1c24;
+}
+
+.resultBookContent {
+  display: grid;
+  gap: 10px;
+}
+
+.bookResultTitle {
+  padding: 8px 10px;
+  background: #fff;
+  border-bottom: 1px solid #ecd7bf;
+}
+
+.bookResultTitle h3 {
+  margin: 0;
+  color: #333;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.bookResultTitle a {
+  color: #004cff;
+  text-decoration: underline;
+}
+
+.bookResultItem .resultBoard {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.bookResultItem .lotteryTable,
+.bookResultItem .lotoTable {
+  margin-top: 0;
+}
+
+.bookResultItem .resultHeading {
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+
+.bookResultItem .resultHeading h1,
+.bookResultItem .resultHeading h2,
+.bookResultItem .resultHeading a,
+.bookResultItem .resultHeading p {
+  color: #fff;
+}
+
+.bookResultItem .resultHeading p {
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.bookResultItem .codeRow {
+  color: #111;
+  background: #fff4bf;
+}
+
+.bookItemDivider {
+  height: 0;
+}
+
+.bookSeeMore {
+  padding: 8px 12px;
+}
+
+.bookSeeMore ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.bookSeeMore li::marker {
+  color: #ed1c24;
+}
+
+.bookSeeMore a {
+  color: #004cff;
+  font-weight: 700;
+}
+
+.bookStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bookTableScroll {
+  overflow-x: auto;
+}
+
+.bookStatsTable {
+  width: 100%;
+  min-width: 360px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.bookStatsTable th,
+.bookStatsTable td {
+  padding: 8px 10px;
+  border: 1px solid #ecd7bf;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.bookStatsTable th {
+  color: #fff;
+  background: linear-gradient(90deg, var(--brand-dark), var(--brand));
+  font-weight: 900;
+}
+
+.bookStatsTable tr:nth-child(odd) td {
+  background: #fffaf2;
+}
+
+.bookRedNumber {
+  color: #ed1c24;
+  font-weight: 900;
+}
+
+.bookTripleStats {
+  min-width: 560px;
+}
+
+.bookTripleStats td {
+  width: 33.333%;
+}
+
+@media (max-width: 900px) {
+  .bookStatsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .bookTabs {
+    grid-template-columns: 1fr;
+  }
+
+  .bookTabs li {
+    border-right: 0;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  .bookTabs li:last-child {
+    border-bottom: 0;
+  }
+
+  .bookFilterForm {
+    grid-template-columns: 1fr;
+  }
+
+  .bookSubmitButton,
+  .bookSelect {
+    width: 100%;
+  }
+
+  .bookResultTitle h3 {
+    font-size: 0.92rem;
   }
 }
